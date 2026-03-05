@@ -155,6 +155,7 @@ export interface CrawlResult {
   pages: PageData[];
   signals: SiteSignals;
   pagespeed: PageSpeedResult;
+  scan_signals: ScanSignals;
   crawledAt: string;
   durationMs: number;
 }

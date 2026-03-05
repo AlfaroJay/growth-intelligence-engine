@@ -12,6 +12,9 @@ import type {
   PerformanceSignals,
   ConversionSignals,
   ExecutionSignals,
+  PageData,
+  SiteSignals,
+  PageSpeedResult,
 } from '@/types';
 
 // ─── Helper: Script Detection ─────────────────────────────────
@@ -284,12 +287,26 @@ function extractExecutionSignals(result: CrawlResult): ExecutionSignals {
  * Extract all ~75 signals from crawl data
  * Signals that couldn't be measured return null (never 0)
  */
-export function extractSignals(result: CrawlResult): ScanSignals {
-  const measurement = extractMeasurementSignals(result);
-  const search = extractSearchSignals(result);
-  const performance = extractPerformanceSignals(result);
-  const conversion = extractConversionSignals(result);
-  const execution = extractExecutionSignals(result);
+export function extractSignals(
+  pages: PageData[],
+  signals: SiteSignals,
+  pagespeed: PageSpeedResult
+): ScanSignals {
+  // Create minimal CrawlResult for extraction
+  const tempResult: CrawlResult = {
+    pages,
+    signals,
+    pagespeed,
+    scan_signals: {} as ScanSignals, // Placeholder, will be set below
+    crawledAt: new Date().toISOString(),
+    durationMs: 0,
+  };
+
+  const measurement = extractMeasurementSignals(tempResult);
+  const search = extractSearchSignals(tempResult);
+  const performance = extractPerformanceSignals(tempResult);
+  const conversion = extractConversionSignals(tempResult);
+  const execution = extractExecutionSignals(tempResult);
 
   // Count non-null signals
   const countNonNull = (obj: unknown): number => {

@@ -5,6 +5,8 @@
  * Crawls up to MAX_PAGES internal pages of a domain, collects on-page signals,
  * and detects analytics tags. Also checks auxiliary signals (sitemap, robots.txt,
  * HTTPS) and optionally calls Google PageSpeed Insights.
+ *
+ * Returns both raw crawl data and extracted ScanSignals for signal-based scoring.
  */
 
 import * as cheerio from 'cheerio';
@@ -13,7 +15,9 @@ import type {
   SiteSignals,
   PageSpeedResult,
   CrawlResult,
+  ScanSignals,
 } from '@/types';
+import { extractSignals } from '@/lib/signal-extractor';
 
 // ─── Constants ────────────────────────────────────────────────
 
@@ -385,10 +389,14 @@ export async function crawlWebsite(websiteUrl: string): Promise<CrawlResult> {
     homepageUrl,
   };
 
+  // Extract detailed signals for scoring engine v2
+  const scanSignals = extractSignals(pages, signals, pagespeed);
+
   return {
     pages,
     signals,
     pagespeed,
+    scan_signals: scanSignals,
     crawledAt: new Date().toISOString(),
     durationMs: Date.now() - startTime,
   };
