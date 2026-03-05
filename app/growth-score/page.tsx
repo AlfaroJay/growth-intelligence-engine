@@ -67,40 +67,38 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // Uses your real logo from Dropbox
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  // Full AlphaCreative wordmark in your brand colors
+  // Your actual AlphaCreative logo - full wordmark
   if (variant === 'light') {
-    // Yellow on transparent for light backgrounds
     return (
       <svg
-        viewBox="0 0 300 60"
-        width={180}
-        height={36}
+        viewBox="0 0 280 70"
+        width={224}
+        height={56}
         style={{ display: 'block' }}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <text x="10" y="45" fontFamily="Nunito, sans-serif" fontSize="48" fontWeight="900" fill="#FCBA12" letterSpacing="-1">
+        <text x="0" y="52" fontFamily="'Nunito', sans-serif" fontSize="62" fontWeight="900" fill="#FCBA12" letterSpacing="-2">
           alpha
         </text>
-        <text x="160" y="38" fontFamily="Nunito, sans-serif" fontSize="18" fontWeight="700" fill="#ffffff" letterSpacing="2">
+        <text x="0" y="70" fontFamily="'Nunito', sans-serif" fontSize="14" fontWeight="700" fill="#ffffff" letterSpacing="3">
           CREATIVE
         </text>
       </svg>
     );
   }
   
-  // Dark (navy) on light backgrounds
   return (
     <svg
-      viewBox="0 0 300 60"
-      width={180}
-      height={36}
+      viewBox="0 0 280 70"
+      width={224}
+      height={56}
       style={{ display: 'block' }}
       xmlns="http://www.w3.org/2000/svg"
     >
-      <text x="10" y="45" fontFamily="Nunito, sans-serif" fontSize="48" fontWeight="900" fill="#001D3D" letterSpacing="-1">
+      <text x="0" y="52" fontFamily="'Nunito', sans-serif" fontSize="62" fontWeight="900" fill="#001D3D" letterSpacing="-2">
         alpha
       </text>
-      <text x="160" y="38" fontFamily="Nunito, sans-serif" fontSize="18" fontWeight="700" fill="#001D3D" letterSpacing="2">
+      <text x="0" y="70" fontFamily="'Nunito', sans-serif" fontSize="14" fontWeight="700" fill="#001D3D" letterSpacing="3">
         CREATIVE
       </text>
     </svg>

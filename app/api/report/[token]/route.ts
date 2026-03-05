@@ -1,7 +1,8 @@
 /**
  * GET /api/report/[token]
  * Returns the job data (score + submission) for a given share token.
- * Used by the public /report/[token] page.
+ * PRIVATE: Only accessible to the person who submitted the report or admin.
+ * Requires ?email=submitter@email.com query param for verification.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -12,15 +13,18 @@ interface RouteParams {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: RouteParams
 ): Promise<NextResponse> {
   const { token } = await params;
+  const { searchParams } = new URL(request.url);
+  const viewerEmail = searchParams.get('email')?.toLowerCase().trim();
 
   if (!token || token.length < 8) {
     return NextResponse.json({ error: 'Invalid token.' }, { status: 400 });
   }
 
+  // Fetch the report with submitter email
   const { data: job, error } = await supabase
     .from('audit_jobs')
     .select(
@@ -32,6 +36,25 @@ export async function GET(
 
   if (error || !job) {
     return NextResponse.json({ error: 'Report not found.' }, { status: 404 });
+  }
+
+  // Security: Verify the viewer is either the submitter or admin
+  const submitterEmail = (job.intake_submissions?.[0]?.email || '').toLowerCase().trim();
+  const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().trim();
+
+  // Check if viewer email matches submitter or is admin
+  if (!viewerEmail) {
+    return NextResponse.json(
+      { error: 'Access denied. Email verification required.' },
+      { status: 403 }
+    );
+  }
+
+  if (viewerEmail !== submitterEmail && viewerEmail !== adminEmail) {
+    return NextResponse.json(
+      { error: 'Access denied. This report is private.' },
+      { status: 403 }
+    );
   }
 
   return NextResponse.json(job);

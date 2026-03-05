@@ -29,36 +29,39 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // ─── AlphaCreative Logo ─────────────────────────────────────────
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  // Full AlphaCreative wordmark in yellow (your actual logo)
+  // Your actual AlphaCreative logo - full wordmark
   return (
     <svg
-      viewBox="0 0 300 60"
-      width={200}
-      height={40}
+      viewBox="0 0 280 70"
+      width={224}
+      height={56}
       style={{ display: 'block' }}
       xmlns="http://www.w3.org/2000/svg"
     >
-      {/* Yellow text: "alpha" */}
+      {/* Yellow "alpha" - bold, large */}
       <text
-        x="10"
-        y="45"
-        fontFamily="Nunito, sans-serif"
-        fontSize="48"
+        x="0"
+        y="52"
+        fontFamily="'Nunito', sans-serif"
+        fontSize="62"
         fontWeight="900"
         fill="#FCBA12"
-        letterSpacing="-1"
+        letterSpacing="-2"
+        style={{ textAnchor: 'start' }}
       >
         alpha
       </text>
-      {/* White text: "CREATIVE" - positioned to right */}
+      
+      {/* White "CREATIVE" - smaller, right-aligned */}
       <text
-        x="160"
-        y="38"
-        fontFamily="Nunito, sans-serif"
-        fontSize="18"
+        x="0"
+        y="70"
+        fontFamily="'Nunito', sans-serif"
+        fontSize="14"
         fontWeight="700"
         fill="#ffffff"
-        letterSpacing="2"
+        letterSpacing="3"
+        style={{ textAnchor: 'start' }}
       >
         CREATIVE
       </text>
@@ -78,7 +81,15 @@ function useReportPolling(token: string) {
 
     const fetchReport = async () => {
       try {
-        const res = await fetch(`/api/report/${token}`);
+        // Get email from session storage (user entered it on the page)
+        const viewerEmail = sessionStorage.getItem('report_viewer_email');
+        
+        const url = new URL(`/api/report/${token}`, window.location.origin);
+        if (viewerEmail) {
+          url.searchParams.set('email', viewerEmail);
+        }
+        
+        const res = await fetch(url.toString());
         if (!res.ok) {
           const d = await res.json();
           setError(d.error ?? 'Report not found.');
@@ -207,7 +218,55 @@ export default function ReportPage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = use(params);
+  const [viewerEmail, setViewerEmail] = useState('');
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
   const { data, error, loading } = useReportPolling(token);
+
+  // ── Email verification modal ─────────────────────────────────
+  if (!emailSubmitted) {
+    return (
+      <Shell>
+        <div className="flex items-center justify-center py-24 px-4">
+          <div className="text-center bg-white rounded-2xl shadow-sm border border-gray-100 p-10 max-w-md">
+            <div className="text-3xl mb-4">🔒</div>
+            <h1 className="text-xl font-bold mb-2" style={{ color: NAVY }}>
+              This report is private
+            </h1>
+            <p className="text-gray-500 text-sm mb-6 leading-relaxed">
+              Enter your email address to access your Growth Intelligence Report.
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (viewerEmail.trim()) {
+                  sessionStorage.setItem('report_viewer_email', viewerEmail.trim());
+                  setEmailSubmitted(true);
+                }
+              }}
+              className="space-y-4"
+            >
+              <input
+                type="email"
+                placeholder="your@email.com"
+                value={viewerEmail}
+                onChange={(e) => setViewerEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                style={{ fontFamily: NUNITO }}
+              />
+              <button
+                type="submit"
+                className="w-full font-bold px-4 py-2 rounded-lg hover:opacity-90 transition"
+                style={{ background: GOLD, color: NAVY, fontFamily: NUNITO }}
+              >
+                Access Report
+              </button>
+            </form>
+          </div>
+        </div>
+      </Shell>
+    );
+  }
 
   // ── Error ────────────────────────────────────────────────────
   if (error) {
