@@ -48,22 +48,6 @@ function ratio(numerator: number, denominator: number): number {
   return numerator / denominator;
 }
 
-function adSpendOver5k(adSpend: string): boolean {
-  return (
-    adSpend.includes('$5,000') ||
-    adSpend.includes('$10,000') ||
-    adSpend.toLowerCase().includes('$5k') ||
-    adSpend.toLowerCase().includes('$10k')
-  );
-}
-
-function implementationTimelineImmediate(timeline: string): boolean {
-  return (
-    timeline.toLowerCase().includes('next quarter') ||
-    timeline.toLowerCase().includes('already actively')
-  );
-}
-
 function isDecisionMaker(role: string | null): boolean {
   if (!role) return false;
   return (
@@ -72,11 +56,6 @@ function isDecisionMaker(role: string | null): boolean {
     role.toLowerCase().includes('director') ||
     role.toLowerCase().includes('vp')
   );
-}
-
-function hasStrategicPriority(services: string[]): boolean {
-  // 3+ services selected indicates strategic investment intent
-  return services.length >= 3;
 }
 
 // ─── Pillar scorers ───────────────────────────────────────────
@@ -344,47 +323,86 @@ function scoreConversionReadiness(
 }
 
 /**
- * Execution Fit (0–10)
- * Based entirely on intake form answers.
+ * Organizational Readiness (0–10)
+ * Based entirely on crawl data: revenue streams, team presence, content maturity, multi-channel setup.
  */
-function scoreExecutionFit(intake: IntakeSubmission): ScoringDetail[] {
-  const over5k = adSpendOver5k(intake.ad_spend);
-  const dm = isDecisionMaker(intake.role);
-  const immediate = implementationTimelineImmediate(intake.implementation_timeline);
-  const strategic = hasStrategicPriority(intake.services_selected);
+function scoreExecutionFit(result: CrawlResult): ScoringDetail[] {
+  // Check for revenue/commerce signals
+  const hasRevenueModel = 
+    result.pages.some(p => p.url.toLowerCase().includes('/pricing')) ||
+    result.pages.some(p => p.url.toLowerCase().includes('/products')) ||
+    result.pages.some(p => p.url.toLowerCase().includes('/shop')) ||
+    result.pages.some(p => p.url.toLowerCase().includes('/checkout')) ||
+    result.pages.some(p => p.url.toLowerCase().includes('/store'));
+  
+  // Check for team presence
+  const hasTeamPage = result.pages.some(p => 
+    p.url.toLowerCase().includes('/team') ||
+    p.url.toLowerCase().includes('/about') ||
+    p.url.toLowerCase().includes('/leadership') ||
+    p.url.toLowerCase().includes('/people')
+  );
+  
+  // Check for blog/content depth (5+ blog posts indicates content strategy)
+  const blogPostCount = result.pages.filter(p =>
+    p.url.toLowerCase().includes('/blog') ||
+    p.url.toLowerCase().includes('/articles') ||
+    p.url.toLowerCase().includes('/news') ||
+    p.url.toLowerCase().includes('/insights') ||
+    p.url.toLowerCase().includes('/post')
+  ).length;
+  const hasActiveContentStrategy = blogPostCount >= 5;
+  
+  // Check for multi-channel presence signals
+  const hasMultiChannelSetup = 
+    result.pages.some(p => p.url.toLowerCase().includes('/contact')) &&
+    result.pages.some(p => p.url.toLowerCase().includes('/social') || 
+                           p.url.toLowerCase().includes('/follow')) &&
+    (result.signals.hasGA4 || result.signals.hasGTM);
+  
+  // Check for substantial site depth (20+ pages indicates active management)
+  const hasSiteMaturity = result.pages.length >= 20;
 
   const details: ScoringDetail[] = [
     {
-      label: 'Budget aligned for growth ($5k+/mo)',
-      points: 4,
-      earned: over5k,
-      explanation: over5k
-        ? `Ad spend of "${intake.ad_spend}" supports meaningful growth investment.`
-        : `Ad spend of "${intake.ad_spend}" may constrain speed of execution. Higher investment unlocks faster compound returns.`,
+      label: 'Revenue model defined',
+      points: 3,
+      earned: hasRevenueModel,
+      explanation: hasRevenueModel
+        ? 'Pricing or product pages detected — clear monetization strategy in place.'
+        : 'No pricing or product pages found. Revenue clarity is essential for growth planning.',
     },
     {
-      label: 'Decision maker engaged',
+      label: 'Team infrastructure visible',
       points: 2,
-      earned: dm,
-      explanation: dm
-        ? `${intake.role} is engaged — decisions can move without additional approval gates.`
-        : 'Decision maker not identified. Projects with executive sponsorship have 3× higher success rates.',
+      earned: hasTeamPage,
+      explanation: hasTeamPage
+        ? 'Team or about page detected — demonstrates organizational presence and scalability potential.'
+        : 'No team/about page. Buyer confidence improves when team is visible.',
     },
     {
-      label: 'Ready to implement soon',
-      points: 2,
-      earned: immediate,
-      explanation: immediate
-        ? `Timeline of "${intake.implementation_timeline}" indicates readiness to execute — momentum will be a competitive advantage.`
-        : `Timeline of "${intake.implementation_timeline}" allows for proper planning but delays compounding growth.`,
+      label: 'Active content strategy',
+      points: 3,
+      earned: hasActiveContentStrategy,
+      explanation: hasActiveContentStrategy
+        ? `${blogPostCount} blog posts detected — indicates consistent content marketing investment.`
+        : 'Fewer than 5 blog posts. Scaling requires ongoing content production.',
     },
     {
-      label: 'Strategic growth priority',
-      points: 2,
-      earned: strategic,
-      explanation: strategic
-        ? `${intake.services_selected.length} service areas selected — growth is clearly a strategic priority.`
-        : 'Focus on 1–2 high-leverage service areas before expanding scope.',
+      label: 'Multi-channel engagement setup',
+      points: 1,
+      earned: hasMultiChannelSetup,
+      explanation: hasMultiChannelSetup
+        ? 'Contact methods + social links + tracking detected — infrastructure for multi-channel growth is in place.'
+        : 'Multi-channel touchpoints not yet established. Add contact forms and social links to improve engagement.',
+    },
+    {
+      label: 'Site maturity (20+ pages)',
+      points: 1,
+      earned: hasSiteMaturity,
+      explanation: hasSiteMaturity
+        ? `${result.pages.length} pages indexed — substantial site foundation for optimization.`
+        : `Only ${result.pages.length} pages indexed. Expand content depth to increase organic reach.`,
     },
   ];
 
@@ -425,7 +443,7 @@ function buildPriorityActions(
     search_opportunity: 'SEO',
     performance_ux: 'Performance',
     conversion_readiness: 'Conversion',
-    execution_fit: 'Execution',
+    execution_fit: 'Readiness',
   };
 
   return missed.slice(0, 5).map((m) => {
@@ -447,7 +465,7 @@ export function calculateScore(
   const searchDetails       = scoreSearchOpportunity(result);
   const performanceDetails  = scorePerformanceUX(result);
   const conversionDetails   = scoreConversionReadiness(result, intake);
-  const executionDetails    = scoreExecutionFit(intake);
+  const executionDetails    = scoreExecutionFit(result);
 
   function sumEarned(details: ScoringDetail[]): number {
     return details.reduce((acc, d) => acc + (d.earned ? d.points : 0), 0);
