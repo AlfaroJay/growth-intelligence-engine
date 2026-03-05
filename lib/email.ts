@@ -159,8 +159,8 @@ export async function sendAdminEmail(
         <tr><td style="padding:6px 0;color:#6b7280;">Company</td><td style="padding:6px 0;">${submission.company}</td></tr>
         <tr><td style="padding:6px 0;color:#6b7280;">Website</td><td style="padding:6px 0;"><a href="${submission.website}" style="color:#001D3D;">${submission.website}</a></td></tr>
         <tr><td style="padding:6px 0;color:#6b7280;">Role</td><td style="padding:6px 0;">${submission.role ?? '—'}</td></tr>
-        <tr><td style="padding:6px 0;color:#6b7280;">Budget</td><td style="padding:6px 0;">${submission.budget}</td></tr>
-        <tr><td style="padding:6px 0;color:#6b7280;">Timeline</td><td style="padding:6px 0;">${submission.timeline}</td></tr>
+        <tr><td style="padding:6px 0;color:#6b7280;">Ad Spend</td><td style="padding:6px 0;">${submission.ad_spend}</td></tr>
+        <tr><td style="padding:6px 0;color:#6b7280;">Implementation Timeline</td><td style="padding:6px 0;">${submission.implementation_timeline}</td></tr>
         <tr><td style="padding:6px 0;color:#6b7280;">Services</td><td style="padding:6px 0;">${submission.services_selected.join(', ')}</td></tr>
       </table>
 

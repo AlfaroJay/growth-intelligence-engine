@@ -15,18 +15,19 @@ const SERVICES = [
   'Full-Service Growth',
 ];
 
-const BUDGETS = [
-  'Under $2,000/month',
-  '$2,000 – $5,000/month',
+const AD_SPEND = [
+  'Not currently spending on ads',
+  'Under $1,000/month',
+  '$1,000 – $5,000/month',
   '$5,000 – $10,000/month',
   '$10,000+/month',
 ];
 
-const TIMELINES = [
-  'ASAP (within 30 days)',
-  '1–3 months',
-  '3–6 months',
-  '6+ months',
+const IMPLEMENTATION_TIMELINE = [
+  'Exploring (researching options)',
+  'Next quarter',
+  'Next 3–6 months',
+  'Already actively implementing',
 ];
 
 const TRACKING_OPTIONS = [
@@ -390,8 +391,8 @@ export default function GrowthScorePage() {
   const [website,  setWebsite]  = useState('');
   const [role,     setRole]     = useState('');
   const [services, setServices] = useState<string[]>([]);
-  const [budget,   setBudget]   = useState('');
-  const [timeline, setTimeline] = useState('');
+  const [adSpend,  setAdSpend]  = useState('');
+  const [implementationTimeline, setImplementationTimeline] = useState('');
   const [tracking, setTracking] = useState('');
   const [channels, setChannels] = useState<string[]>([]);
 
@@ -455,7 +456,7 @@ export default function GrowthScorePage() {
       }
     }
     if (step === 2) {
-      if (services.length === 0 || !budget || !timeline) {
+      if (services.length === 0 || !adSpend || !implementationTimeline) {
         setError('Please complete all selections before continuing.');
         return;
       }
@@ -484,8 +485,8 @@ export default function GrowthScorePage() {
           website,
           role,
           services_selected: services,
-          budget,
-          timeline,
+          ad_spend: adSpend,
+          implementation_timeline: implementationTimeline,
           tracking_maturity: tracking,
           marketing_channels: channels,
           website_confirm: '',
@@ -701,18 +702,18 @@ export default function GrowthScorePage() {
                       cols={2}
                     />
                   </Field>
-                  <Field label="Monthly budget for growth?" required>
+                  <Field label="What is your current online ad spend?" required>
                     <SingleSelect
-                      options={BUDGETS}
-                      value={budget}
-                      onChange={setBudget}
+                      options={AD_SPEND}
+                      value={adSpend}
+                      onChange={setAdSpend}
                     />
                   </Field>
-                  <Field label="When do you want to start seeing results?" required>
+                  <Field label="When are you looking to implement growth strategies?" required>
                     <SingleSelect
-                      options={TIMELINES}
-                      value={timeline}
-                      onChange={setTimeline}
+                      options={IMPLEMENTATION_TIMELINE}
+                      value={implementationTimeline}
+                      onChange={setImplementationTimeline}
                     />
                   </Field>
                 </div>

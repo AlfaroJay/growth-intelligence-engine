@@ -15,17 +15,18 @@ export type ServiceOption =
   | 'Website Optimization'
   | 'Full-Service Growth';
 
-export type BudgetOption =
-  | 'Under $2,000/month'
-  | '$2,000 – $5,000/month'
+export type AdSpendOption =
+  | 'Not currently spending on ads'
+  | 'Under $1,000/month'
+  | '$1,000 – $5,000/month'
   | '$5,000 – $10,000/month'
   | '$10,000+/month';
 
-export type TimelineOption =
-  | 'ASAP (within 30 days)'
-  | '1–3 months'
-  | '3–6 months'
-  | '6+ months';
+export type ImplementationTimelineOption =
+  | 'Exploring (researching options)'
+  | 'Next quarter'
+  | 'Next 3–6 months'
+  | 'Already actively implementing';
 
 export type TrackingMaturity =
   | 'No tracking set up'
@@ -60,8 +61,8 @@ export interface IntakeFormData {
   role: RoleOption | '';
   // Step 2 – Goals
   services_selected: ServiceOption[];
-  budget: BudgetOption | '';
-  timeline: TimelineOption | '';
+  ad_spend: AdSpendOption | '';
+  implementation_timeline: ImplementationTimelineOption | '';
   // Step 3 – Marketing maturity
   tracking_maturity: TrackingMaturity | '';
   marketing_channels: MarketingChannel[];
@@ -80,8 +81,8 @@ export interface IntakeSubmission {
   website: string;
   role: string | null;
   services_selected: string[];
-  budget: string;
-  timeline: string;
+  ad_spend: string;
+  implementation_timeline: string;
   tracking_maturity: string;
   marketing_channels: string[];
   raw_payload: Record<string, unknown>;

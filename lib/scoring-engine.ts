@@ -48,21 +48,19 @@ function ratio(numerator: number, denominator: number): number {
   return numerator / denominator;
 }
 
-function budgetOver5k(budget: string): boolean {
+function adSpendOver5k(adSpend: string): boolean {
   return (
-    budget.includes('$5,000') ||
-    budget.includes('$10,000') ||
-    budget.toLowerCase().includes('$5k') ||
-    budget.toLowerCase().includes('$10k')
+    adSpend.includes('$5,000') ||
+    adSpend.includes('$10,000') ||
+    adSpend.toLowerCase().includes('$5k') ||
+    adSpend.toLowerCase().includes('$10k')
   );
 }
 
-function timelineUnder90Days(timeline: string): boolean {
+function implementationTimelineImmediate(timeline: string): boolean {
   return (
-    timeline.toLowerCase().includes('asap') ||
-    timeline.includes('30 days') ||
-    timeline.includes('1–3 months') ||
-    timeline.includes('1-3 months')
+    timeline.toLowerCase().includes('next quarter') ||
+    timeline.toLowerCase().includes('already actively')
   );
 }
 
@@ -350,9 +348,9 @@ function scoreConversionReadiness(
  * Based entirely on intake form answers.
  */
 function scoreExecutionFit(intake: IntakeSubmission): ScoringDetail[] {
-  const over5k = budgetOver5k(intake.budget);
+  const over5k = adSpendOver5k(intake.ad_spend);
   const dm = isDecisionMaker(intake.role);
-  const under90 = timelineUnder90Days(intake.timeline);
+  const immediate = implementationTimelineImmediate(intake.implementation_timeline);
   const strategic = hasStrategicPriority(intake.services_selected);
 
   const details: ScoringDetail[] = [
@@ -361,8 +359,8 @@ function scoreExecutionFit(intake: IntakeSubmission): ScoringDetail[] {
       points: 4,
       earned: over5k,
       explanation: over5k
-        ? `Budget of "${intake.budget}" supports meaningful growth investment.`
-        : `Budget of "${intake.budget}" may constrain speed of execution. Higher investment unlocks faster compound returns.`,
+        ? `Ad spend of "${intake.ad_spend}" supports meaningful growth investment.`
+        : `Ad spend of "${intake.ad_spend}" may constrain speed of execution. Higher investment unlocks faster compound returns.`,
     },
     {
       label: 'Decision maker engaged',
@@ -373,12 +371,12 @@ function scoreExecutionFit(intake: IntakeSubmission): ScoringDetail[] {
         : 'Decision maker not identified. Projects with executive sponsorship have 3× higher success rates.',
     },
     {
-      label: 'Urgent timeline (<90 days)',
+      label: 'Ready to implement soon',
       points: 2,
-      earned: under90,
-      explanation: under90
-        ? `Timeline of "${intake.timeline}" indicates readiness to execute — momentum will be a competitive advantage.`
-        : `Timeline of "${intake.timeline}" allows for proper planning but delays compounding growth.`,
+      earned: immediate,
+      explanation: immediate
+        ? `Timeline of "${intake.implementation_timeline}" indicates readiness to execute — momentum will be a competitive advantage.`
+        : `Timeline of "${intake.implementation_timeline}" allows for proper planning but delays compounding growth.`,
     },
     {
       label: 'Strategic growth priority',
