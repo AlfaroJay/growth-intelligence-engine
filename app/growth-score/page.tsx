@@ -468,11 +468,6 @@ export default function GrowthScorePage() {
     e.preventDefault();
     setError('');
 
-    if (!tracking) {
-      setError('Please select your tracking maturity level.');
-      return;
-    }
-
     setLoading(true);
     try {
       const res = await fetch('/api/submit', {
@@ -722,7 +717,7 @@ export default function GrowthScorePage() {
               {/* ── Step 3: Maturity ────────────────────────── */}
               {step === 3 && (
                 <div className="space-y-6">
-                  <Field label="How would you describe your current tracking setup?" required>
+                  <Field label="How would you describe your current tracking setup?">
                     <SingleSelect
                       options={TRACKING_OPTIONS}
                       value={tracking}
