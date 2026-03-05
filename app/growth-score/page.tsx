@@ -67,17 +67,34 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // Uses your real logo from Dropbox
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
+  const iconColor = variant === 'light' ? GOLD : NAVY;
+  const shadowColor = variant === 'light' ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`;
+  
   return (
     <div className="flex items-center gap-2.5">
-      {/* Real AlphaCreative logo icon */}
-      <img
-        src="https://www.dropbox.com/scl/fi/2pbw2s1tu3hhbpcqv3jfy/Alpha-Icon_1080-3x.png?rlkey=n6ac0v768s718aqnocj4ybtcc&dl=1"
-        alt="AlphaCreative"
-        className="w-10 h-10 rounded-full flex-shrink-0"
+      {/* SVG Alpha icon */}
+      <div
+        className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
         style={{
-          boxShadow: variant === 'light' ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`,
+          background: variant === 'light' ? `rgba(252, 186, 18, 0.1)` : `rgba(0, 29, 61, 0.05)`,
+          boxShadow: shadowColor,
         }}
-      />
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="24"
+          height="24"
+          fill="none"
+          stroke={iconColor}
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 2L2 22h20L12 2Z" />
+          <line x1="12" y1="8" x2="8" y2="20" />
+          <line x1="12" y1="8" x2="16" y2="20" />
+        </svg>
+      </div>
       {/* Wordmark: "alpha" + "CREATIVE" */}
       <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
         <span
