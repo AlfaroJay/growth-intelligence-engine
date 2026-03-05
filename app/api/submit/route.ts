@@ -242,9 +242,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   if (!isValidEmail(email)) errors.push('A valid email address is required.');
   if (!company || company.length < 1) errors.push('Company name is required.');
   if (!isValidUrl(website)) errors.push('A valid website URL is required.');
-  if (!budget) errors.push('Budget selection is required.');
-  if (!timeline) errors.push('Timeline selection is required.');
-  if (!tracking_maturity) errors.push('Tracking maturity is required.');
   if (services_selected.length === 0) errors.push('Please select at least one service.');
 
   if (errors.length > 0) {
