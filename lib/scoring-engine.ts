@@ -428,7 +428,7 @@ function buildPriorityActions(
       conversion_readiness: 'Conversion',
       execution_fit: 'Execution',
     };
-    return `[${pillarLabel[m.pillar]}] ${m.label} (+${m.points} pts potential)`;
+    return `[${pillarLabel[m.pillar as keyof Subscores]}] ${m.label} (+${m.points} pts potential)`;
   });
 }
 
