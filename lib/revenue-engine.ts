@@ -1,181 +1,230 @@
 /**
  * AlphaCreative Growth Scanner – Revenue Opportunity Engine
  *
- * Estimates lost traffic, leads, and revenue from signal analysis
+ * Calculates implementation upside based on measured signals.
+ * High confidence: user provides actual metrics
+ * Medium confidence: strong signal pattern detected
+ * Low confidence: limited data, assumptions needed
  */
 
-import type { ScanSignals, RevenueOpportunity } from '@/types';
+import type { ScanSignals, RevenueOpportunity, ConfidenceTier } from '@/types';
 
 /**
- * Estimate traffic potential based on indexed pages
- * Typical range: 40–120 visits per page per month
+ * Score signal coverage: how many pillars did we actually measure?
+ * Signals we can't measure = we can't score improvements on them
  */
-function estimateTrafficPotential(
-  pagesAnalyzed: number,
-  signals: ScanSignals
-): { min: number; max: number } {
-  // Conservative estimate: 40 visits/page (organic + referral)
-  const minPerPage = 40;
-  // Optimistic estimate: 120 visits/page
-  const maxPerPage = 120;
-
-  // Adjust based on measured performance
-  let adjustedMin = minPerPage;
-  let adjustedMax = maxPerPage;
-
-  // If performance is poor, reduce potential
-  if (signals.performance.lighthouse_performance !== null) {
-    if (signals.performance.lighthouse_performance < 30) {
-      // Slow sites get 50% of potential
-      adjustedMin = Math.floor(minPerPage * 0.5);
-      adjustedMax = Math.floor(maxPerPage * 0.5);
-    } else if (signals.performance.lighthouse_performance < 50) {
-      // Below average sites get 75% of potential
-      adjustedMin = Math.floor(minPerPage * 0.75);
-      adjustedMax = Math.floor(maxPerPage * 0.75);
-    }
+function assessSignalCoverage(signals: ScanSignals): {
+  measured_pillars: number;
+  total_pillars: number;
+  coverage_percent: number;
+} {
+  let measured = 0;
+  
+  // Measurement: have we detected analytics/tracking?
+  if (signals.measurement.ga4_detected !== null || signals.measurement.gtm_detected !== null) {
+    measured++;
   }
-
-  // If mobile isn't friendly, reduce by 40% (lost mobile traffic)
-  if (signals.performance.mobile_friendly === false) {
-    adjustedMin = Math.floor(adjustedMin * 0.6);
-    adjustedMax = Math.floor(adjustedMax * 0.6);
+  
+  // Search: have we analyzed SEO signals?
+  if (signals.search.pages_with_title !== null || signals.search.pages_with_meta_description !== null) {
+    measured++;
   }
-
-  // If SEO fundamentals missing (no title/meta), reduce by 50%
-  if (
-    signals.search.pages_with_title === 0 ||
-    signals.search.pages_with_meta_description === 0
-  ) {
-    adjustedMin = Math.floor(adjustedMin * 0.5);
-    adjustedMax = Math.floor(adjustedMax * 0.5);
+  
+  // Performance: have we tested speed?
+  if (signals.performance.lighthouse_performance !== null || signals.performance.lcp_avg !== null) {
+    measured++;
   }
-
+  
+  // Conversion: have we analyzed conversion elements?
+  if (signals.conversion.forms_detected !== null || signals.conversion.cta_buttons_detected !== null) {
+    measured++;
+  }
+  
+  // Execution: have we identified team/content infrastructure?
+  if (signals.execution.team_page_present !== null || signals.execution.blog_detected !== null) {
+    measured++;
+  }
+  
   return {
-    min: Math.max(0, Math.floor(pagesAnalyzed * adjustedMin)),
-    max: Math.max(0, Math.floor(pagesAnalyzed * adjustedMax)),
+    measured_pillars: measured,
+    total_pillars: 5,
+    coverage_percent: (measured / 5) * 100,
   };
 }
 
 /**
- * Estimate lead conversion rate based on conversion signals
- * Default: 1% of traffic converts to leads
- * Range: 0.5% (weak) → 2% (strong)
+ * Determine confidence tier based on what we know
  */
-function estimateLeadRate(signals: ScanSignals): number {
-  let leadRate = 0.01; // Default 1%
-
-  // Weak conversion signals → lower rate (0.5%)
-  if (
-    signals.conversion.forms_detected === null ||
-    signals.conversion.forms_detected === 0
-  ) {
-    leadRate = 0.005;
+function calculateConfidenceTier(
+  signals: ScanSignals,
+  coverage: { measured_pillars: number; coverage_percent: number },
+  userProvidedMetrics: boolean
+): { tier: ConfidenceTier; explanation: string } {
+  // High confidence: user gave us actual metrics (we can do real math)
+  if (userProvidedMetrics) {
+    return {
+      tier: 'high',
+      explanation: 'Based on your actual traffic and conversion data',
+    };
   }
-
-  // Strong conversion signals → higher rate (1.5%)
-  let conversionSignals = 0;
-  if (signals.conversion.forms_detected !== null && signals.conversion.forms_detected > 0) {
-    conversionSignals++;
+  
+  // Medium confidence: we measured most pillars and have strong signals
+  if (coverage.measured_pillars >= 4) {
+    return {
+      tier: 'medium',
+      explanation: `Based on measured signals across ${coverage.measured_pillars}/5 growth pillars`,
+    };
   }
-  if (signals.conversion.cta_buttons_detected !== null && signals.conversion.cta_buttons_detected >= 2) {
-    conversionSignals++;
+  
+  // Low confidence: we measured some pillars but have gaps
+  if (coverage.measured_pillars >= 2) {
+    return {
+      tier: 'low',
+      explanation: `Based on partial analysis (${coverage.measured_pillars}/5 pillars measured). Provide your traffic/lead data for accuracy.`,
+    };
   }
-  if (
-    signals.conversion.calendly_detected === true ||
-    signals.conversion.cal_com_detected === true
-  ) {
-    conversionSignals++;
-  }
-  if (signals.conversion.testimonials_present === true) {
-    conversionSignals++;
-  }
-
-  if (conversionSignals >= 3) {
-    leadRate = 0.015; // 1.5%
-  }
-
-  return leadRate;
+  
+  // Very low: we barely know anything
+  return {
+    tier: 'low',
+    explanation: 'Limited measurement data. Share your current traffic and conversion metrics for realistic estimates.',
+  };
 }
 
 /**
- * Estimate lost revenue based on:
- * - Lost traffic (estimated potential vs. implied current)
- * - Lead rate (estimated from signals)
- * - Average customer value (provided or default)
+ * Calculate implementation upside: what could be gained by fixing issues we found
+ */
+function calculateUpside(
+  pagesAnalyzed: number,
+  signals: ScanSignals,
+  acv: number
+): { traffic: number; leads: number; revenue: number } {
+  // Base assumption: 1 lead per 100 visits, if conversion is optimized
+  const baseLeadRate = 0.01;
+  let trafficUpside = 0;
+  let leadUpside = 0;
+  
+  // Upside from fixing performance issues
+  if (signals.performance.lighthouse_performance !== null && signals.performance.lighthouse_performance < 70) {
+    // Assuming performance improvement yields 15-20% more organic traffic
+    trafficUpside += Math.floor(pagesAnalyzed * 50 * 0.15);
+  }
+  
+  // Upside from fixing SEO fundamentals
+  if (
+    signals.search.pages_with_title === 0 ||
+    signals.search.pages_with_meta_description === 0 ||
+    signals.search.avg_internal_links_per_page === 0
+  ) {
+    // Missing SEO basics = likely 30-50% uplift if fixed
+    trafficUpside += Math.floor(pagesAnalyzed * 50 * 0.3);
+  } else if (signals.search.pages_with_title !== null && signals.search.pages_with_title < (pagesAnalyzed * 0.5)) {
+    // Low keyword coverage = moderate upside
+    trafficUpside += Math.floor(pagesAnalyzed * 50 * 0.15);
+  }
+  
+  // Upside from adding/improving conversion elements
+  let conversionGaps = 0;
+  if (!signals.conversion.forms_detected || signals.conversion.forms_detected === 0) conversionGaps++;
+  if (!signals.conversion.cta_buttons_detected || signals.conversion.cta_buttons_detected === 0) conversionGaps++;
+  if (signals.conversion.calendly_detected === false && signals.conversion.cal_com_detected === false) conversionGaps++;
+  
+  if (conversionGaps >= 2) {
+    // Major conversion gaps = could double conversion rate (0.5% → 1.5%)
+    leadUpside = Math.floor((trafficUpside || pagesAnalyzed * 50) * 0.015) - Math.floor((trafficUpside || pagesAnalyzed * 50) * baseLeadRate);
+  }
+  
+  // If no upside detected from traffic, assume minimal improvement
+  if (trafficUpside === 0) {
+    trafficUpside = Math.floor(pagesAnalyzed * 30); // 30 visits/page conservative
+  }
+  
+  // Convert traffic to leads if not already calculated
+  if (leadUpside === 0) {
+    leadUpside = Math.floor(trafficUpside * baseLeadRate);
+  }
+  
+  const revenueUpside = Math.floor(leadUpside * acv);
+  
+  return {
+    traffic: trafficUpside,
+    leads: leadUpside,
+    revenue: revenueUpside,
+  };
+}
+
+/**
+ * Main: Calculate revenue opportunity with honest confidence assessment
  */
 export function estimateRevenueOpportunity(
   pagesAnalyzed: number,
   signals: ScanSignals,
-  avgCustomerValue?: number
+  avgCustomerValue?: number,
+  userCurrentTraffic?: number,
+  userCurrentLeads?: number
 ): RevenueOpportunity {
-  // Default to $1000 average customer value if not provided
   const acv = avgCustomerValue ?? 1000;
-
-  // Estimate traffic potential
-  const trafficPotential = estimateTrafficPotential(pagesAnalyzed, signals);
-
-  // Estimate lead rate
-  const leadRate = estimateLeadRate(signals);
-
-  // Calculate lost leads per month (assume current traffic is near zero or minimal for new sites)
-  // For simplicity: use average of potential range
-  const avgPotentialTraffic = (trafficPotential.min + trafficPotential.max) / 2;
-  const potentialLeads = Math.floor(avgPotentialTraffic * leadRate);
-
-  // Assume current traffic is minimal (for new/unoptimized sites)
-  // Lost leads = potential - current (assume current ≈ 0 for most cases)
-  const lostLeadsPerMonth = Math.max(0, potentialLeads);
-
-  // Lost revenue
-  const lostRevenueMin = Math.floor(trafficPotential.min * leadRate * acv * 0.1); // 10% of potential (conservative)
-  const lostRevenueMax = Math.floor(trafficPotential.max * leadRate * acv);
-
+  const coverage = assessSignalCoverage(signals);
+  const userProvidedMetrics = !!(userCurrentTraffic !== undefined && userCurrentLeads !== undefined);
+  
+  const { tier, explanation } = calculateConfidenceTier(signals, coverage, userProvidedMetrics);
+  
+  let upside;
+  
+  if (userProvidedMetrics && userCurrentTraffic && userCurrentLeads) {
+    // Real calculation: compare current to potential
+    const potentialTraffic = Math.floor(pagesAnalyzed * 80); // 80 visits/page if optimized
+    const potentialLeadRate = 0.01; // 1% if conversion optimized
+    const potentialLeads = Math.floor(potentialTraffic * potentialLeadRate);
+    
+    upside = {
+      traffic: Math.max(0, potentialTraffic - userCurrentTraffic),
+      leads: Math.max(0, potentialLeads - userCurrentLeads),
+      revenue: Math.max(0, (potentialLeads - userCurrentLeads) * acv),
+    };
+  } else {
+    // Estimate based on measured issues
+    upside = calculateUpside(pagesAnalyzed, signals, acv);
+  }
+  
   return {
-    lost_traffic_range: trafficPotential,
-    lost_leads_per_month: lostLeadsPerMonth,
-    lost_revenue_range: {
-      min: lostRevenueMin,
-      max: lostRevenueMax,
-    },
-    confidence: calculateRevenueConfidence(signals),
+    upside_traffic_per_month: upside.traffic,
+    upside_leads_per_month: upside.leads,
+    upside_revenue_per_month: upside.revenue,
+    confidence_tier: tier,
+    confidence_explanation: explanation,
+    user_current_traffic: userCurrentTraffic,
+    user_current_leads: userCurrentLeads,
+    user_acv: avgCustomerValue,
   };
 }
 
 /**
- * Confidence in revenue estimates
- * Higher if we have more signals (especially conversion data)
+ * Format upside potential as human-readable string
  */
-function calculateRevenueConfidence(signals: ScanSignals): number {
-  let confidence = signals.confidence; // Start with overall signal confidence
-
-  // Boost if we have conversion signals
-  let conversionSignalsPresent = 0;
-  if (signals.conversion.forms_detected !== null) conversionSignalsPresent++;
-  if (signals.conversion.cta_buttons_detected !== null) conversionSignalsPresent++;
-  if (signals.performance.lighthouse_performance !== null) conversionSignalsPresent++;
-  if (signals.search.pages_with_title !== null) conversionSignalsPresent++;
-
-  if (conversionSignalsPresent >= 3) {
-    confidence = Math.min(100, confidence + 10);
+export function formatRevenueUpside(opportunity: RevenueOpportunity): string {
+  const monthly = opportunity.upside_revenue_per_month;
+  const annual = monthly * 12;
+  
+  if (monthly === 0) {
+    return 'No measurable upside (strong foundation)';
   }
-
-  return confidence;
+  
+  return `$${monthly.toLocaleString()}/month ($${annual.toLocaleString()}/year)`;
 }
 
 /**
- * Format revenue range as human-readable string
+ * Format confidence as human-friendly explanation
  */
-export function formatRevenueRange(range: { min: number; max: number }): string {
-  return `$${range.min.toLocaleString()} – $${range.max.toLocaleString()}`;
-}
-
-/**
- * Format monthly lost leads
- */
-export function formatLeadCount(count: number): string {
-  if (count === 0) return 'No measurable opportunity (strong signals)';
-  if (count < 5) return `${count} potential leads/month`;
-  if (count < 50) return `${count} potential leads/month`;
-  return `${count}+ potential leads/month`;
+export function formatConfidence(opportunity: RevenueOpportunity): string {
+  const tier = opportunity.confidence_tier;
+  const base = opportunity.confidence_explanation;
+  
+  if (tier === 'high') {
+    return `✓ ${base}`;
+  }
+  if (tier === 'medium') {
+    return `~ ${base}`;
+  }
+  return `? ${base}`;
 }

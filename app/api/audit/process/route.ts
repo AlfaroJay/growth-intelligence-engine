@@ -138,9 +138,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const revenueOpportunity = estimateRevenueOpportunity(
       crawlResult.pages.length,
       crawlResult.scan_signals,
-      1_000_000 // Default to $1M ACV estimate
+      1_000_000, // Default to $1M ACV estimate
+      undefined, // No user-provided current traffic
+      undefined  // No user-provided current leads
     );
-    console.log(`[audit] Revenue opportunity: $${revenueOpportunity.lost_revenue_range.min}-$${revenueOpportunity.lost_revenue_range.max}`);
+    console.log(`[audit] Upside potential: $${revenueOpportunity.upside_revenue_per_month}/month (confidence: ${revenueOpportunity.confidence_tier})`);
 
     // Build SignalBasedScore object for storage and reporting
     const signalScore: SignalBasedScore = {

@@ -423,11 +423,22 @@ export interface Opportunity {
   evidence: Record<string, unknown>;
 }
 
+export type ConfidenceTier = 'high' | 'medium' | 'low';
+
 export interface RevenueOpportunity {
-  lost_traffic_range: { min: number; max: number };
-  lost_leads_per_month: number;
-  lost_revenue_range: { min: number; max: number };
-  confidence: number;
+  // Upside potential: what's achievable by fixing measured issues
+  upside_traffic_per_month: number;
+  upside_leads_per_month: number;
+  upside_revenue_per_month: number;
+  
+  // How certain we are about this estimate
+  confidence_tier: ConfidenceTier;
+  confidence_explanation: string;
+  
+  // Optional: user-provided current metrics for real calculation
+  user_current_traffic?: number; // visits/month
+  user_current_leads?: number; // leads/month
+  user_acv?: number; // average customer value
 }
 
 export interface SignalBasedScore {

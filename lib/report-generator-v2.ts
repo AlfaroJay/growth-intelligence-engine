@@ -238,20 +238,20 @@ export function generateSignalBasedReport(
       <h2 style="font-size:18px;font-weight:700;color:#111827;margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #e5e7eb;">📈 Revenue Impact Estimate</h2>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
         <div style="background:#f3f4f6;padding:16px;border-radius:8px;">
-          <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Monthly Lost Traffic</div>
-          <div style="font-size:20px;font-weight:700;color:#111827;">${revenue_opportunity.lost_traffic_range.min.toLocaleString()}–${revenue_opportunity.lost_traffic_range.max.toLocaleString()}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px;">potential visits/month</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Monthly Upside Traffic</div>
+          <div style="font-size:20px;font-weight:700;color:#111827;">${revenue_opportunity.upside_traffic_per_month.toLocaleString()}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px;">potential new visits/month</div>
         </div>
         <div style="background:#f3f4f6;padding:16px;border-radius:8px;">
-          <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Monthly Lost Leads</div>
-          <div style="font-size:20px;font-weight:700;color:#111827;">${revenue_opportunity.lost_leads_per_month.toLocaleString()}</div>
-          <div style="font-size:11px;color:#9ca3af;margin-top:4px;">estimated qualified leads</div>
+          <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">Monthly Upside Leads</div>
+          <div style="font-size:20px;font-weight:700;color:#111827;">${revenue_opportunity.upside_leads_per_month.toLocaleString()}</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:4px;">from fixing measured gaps</div>
         </div>
       </div>
       <div style="background:#fef3c7;border-left:4px solid #d97706;padding:16px;border-radius:8px;">
-        <div style="font-size:12px;color:#92400e;margin-bottom:6px;">💰 Estimated Annual Revenue Opportunity</div>
-        <div style="font-size:20px;font-weight:700;color:#92400e;">$${revenue_opportunity.lost_revenue_range.min.toLocaleString()}–$${revenue_opportunity.lost_revenue_range.max.toLocaleString()}</div>
-        <div style="font-size:11px;color:#b45309;margin-top:4px;">based on ${revenue_opportunity.confidence}% measurement confidence</div>
+        <div style="font-size:12px;color:#92400e;margin-bottom:6px;">💰 Estimated Monthly Upside</div>
+        <div style="font-size:20px;font-weight:700;color:#92400e;">$${revenue_opportunity.upside_revenue_per_month.toLocaleString()}</div>
+        <div style="font-size:11px;color:#b45309;margin-top:4px;">${revenue_opportunity.confidence_explanation}</div>
       </div>
     </div>
 

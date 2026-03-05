@@ -50,10 +50,10 @@ async function testScoringPipeline() {
       crawlResult.scan_signals,
       1_000_000
     );
-    console.log(`   ✓ Lost traffic: ${revenueOpp.lost_traffic_range.min}-${revenueOpp.lost_traffic_range.max} visits/month`);
-    console.log(`   ✓ Lost leads: ${revenueOpp.lost_leads_per_month} leads/month`);
-    console.log(`   ✓ Lost revenue: $${revenueOpp.lost_revenue_range.min.toLocaleString()}-$${revenueOpp.lost_revenue_range.max.toLocaleString()}`);
-    console.log(`   ✓ Confidence: ${revenueOpp.confidence}%`);
+    console.log(`   ✓ Upside traffic: ${revenueOpp.upside_traffic_per_month} visits/month`);
+    console.log(`   ✓ Upside leads: ${revenueOpp.upside_leads_per_month} leads/month`);
+    console.log(`   ✓ Upside revenue: $${revenueOpp.upside_revenue_per_month.toLocaleString()}/month`);
+    console.log(`   ✓ Confidence: ${revenueOpp.confidence_tier} (${revenueOpp.confidence_explanation})`);
 
     console.log('\n=== All Tests Passed ✓ ===\n');
     return { success: true, score: totalScore };
