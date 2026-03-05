@@ -63,40 +63,27 @@ const GOLD      = '#FCBA12';
 const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 
 // ─── AlphaCreative Logo ─────────────────────────────────────────
-// Matches brand guide: aC monogram mark + "alpha CREATIVE" wordmark
+// Uses your real logo from Dropbox
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  const isLight = variant === 'light'; // light = on dark background
   return (
-    <div className="flex items-center gap-3">
-      {/* aC monogram icon */}
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+    <div className="flex items-center gap-2.5">
+      {/* Real AlphaCreative logo icon */}
+      <img
+        src="https://www.dropbox.com/scl/fi/2pbw2s1tu3hhbpcqv3jfy/Alpha-Icon_1080-3x.png?rlkey=n6ac0v768s718aqnocj4ybtcc&dl=1"
+        alt="AlphaCreative"
+        className="w-10 h-10 rounded-full flex-shrink-0"
         style={{
-          background: isLight ? GOLD : NAVY,
-          boxShadow: isLight ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`,
+          boxShadow: variant === 'light' ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`,
         }}
-      >
-        <span
-          style={{
-            fontFamily: NUNITO,
-            fontSize: '15px',
-            lineHeight: 1,
-            color: isLight ? NAVY : GOLD,
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-          }}
-        >
-          aC
-        </span>
-      </div>
+      />
       {/* Wordmark: "alpha" + "CREATIVE" */}
       <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
         <span
           style={{
             fontSize: '17px',
             fontWeight: 800,
-            color: isLight ? GOLD : NAVY,
+            color: variant === 'light' ? GOLD : NAVY,
             letterSpacing: '-0.03em',
             lineHeight: 1,
           }}
@@ -107,7 +94,7 @@ function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
           style={{
             fontSize: '10px',
             fontWeight: 700,
-            color: isLight ? '#ffffff' : NAVY,
+            color: variant === 'light' ? '#ffffff' : NAVY,
             letterSpacing: '0.12em',
             lineHeight: 1.2,
           }}
@@ -198,7 +185,8 @@ function Field({
 const inputClass =
   'w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none transition placeholder:text-gray-400 bg-white shadow-sm hover:border-gray-400';
 
-const selectClass = inputClass;
+const selectClass =
+  'w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none transition bg-white shadow-sm hover:border-gray-400 appearance-none cursor-pointer';
 
 function MultiSelect({
   options,
@@ -664,16 +652,30 @@ export default function GrowthScorePage() {
                     />
                   </Field>
                   <Field label="Your Role">
-                    <select
-                      className={selectClass}
-                      value={role}
-                      onChange={(e) => setRole(e.target.value)}
-                    >
-                      <option value="">Select your role…</option>
-                      {ROLES.map((r) => (
-                        <option key={r} value={r}>{r}</option>
-                      ))}
-                    </select>
+                    <div className="relative">
+                      <select
+                        className={selectClass}
+                        value={role}
+                        onChange={(e) => setRole(e.target.value)}
+                        style={{
+                          paddingRight: '2.5rem',
+                          color: role ? NAVY : '#9ca3af',
+                        }}
+                      >
+                        <option value="">Select your role…</option>
+                        {ROLES.map((r) => (
+                          <option key={r} value={r}>{r}</option>
+                        ))}
+                      </select>
+                      <div
+                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2"
+                        style={{ color: GOLD }}
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                        </svg>
+                      </div>
+                    </div>
                   </Field>
 
                   {/* Honeypot */}
