@@ -404,7 +404,7 @@ function assignTier(total: number): GrowthTier {
 function buildPriorityActions(
   details: Record<keyof Subscores, ScoringDetail[]>
 ): string[] {
-  const missed: { label: string; pillar: string; points: number }[] = [];
+  const missed: { label: string; pillar: keyof Subscores; points: number }[] = [];
 
   for (const [pillar, items] of Object.entries(details) as [
     keyof Subscores,
@@ -428,7 +428,7 @@ function buildPriorityActions(
       conversion_readiness: 'Conversion',
       execution_fit: 'Execution',
     };
-    return `[${pillarLabel[m.pillar as keyof Subscores]}] ${m.label} (+${m.points} pts potential)`;
+    return `[${pillarLabel[m.pillar]}] ${m.label} (+${m.points} pts potential)`;
   });
 }
 
