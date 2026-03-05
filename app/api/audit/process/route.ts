@@ -25,9 +25,41 @@ import { detectOpportunities } from '@/lib/opportunity-engine';
 import { estimateRevenueOpportunity } from '@/lib/revenue-engine';
 import { generateSignalBasedReport } from '@/lib/report-generator-v2';
 import { sendClientEmail, sendAdminEmail } from '@/lib/email';
-import type { IntakeSubmission, SignalBasedScore } from '@/types';
+import type { IntakeSubmission, SignalBasedScore, GrowthScore, GrowthTier } from '@/types';
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'admin@example.com';
+
+// ─── Convert SignalBasedScore to GrowthScore for email ─────────
+
+function getTierFromScore(score: number): GrowthTier {
+  if (score >= 75) return 'Scale';
+  if (score >= 50) return 'Acceleration';
+  return 'Foundation';
+}
+
+function signalScoreToGrowthScore(signalScore: SignalBasedScore): GrowthScore {
+  return {
+    model: 'AC-GIE-v1.0',
+    total: signalScore.growth_score,
+    subscores: {
+      measurement_maturity: signalScore.breakdown.measurement_infrastructure,
+      search_opportunity: signalScore.breakdown.search_opportunity,
+      performance_ux: signalScore.breakdown.performance_ux,
+      conversion_readiness: signalScore.breakdown.conversion_readiness,
+      execution_fit: signalScore.breakdown.execution_maturity,
+    },
+    tier: getTierFromScore(signalScore.growth_score),
+    priority_actions: [],
+    details: {
+      measurement_maturity: [],
+      search_opportunity: [],
+      performance_ux: [],
+      conversion_readiness: [],
+      execution_fit: [],
+    },
+    scored_at: signalScore.scored_at,
+  };
+}
 
 // Tell Vercel to allow up to 60 seconds for this function
 export const maxDuration = 60;
@@ -155,9 +187,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // ── Send emails ────────────────────────────────────────────
     try {
       console.log(`[audit] Sending emails to ${submission.email} and admin...`);
+      const growthScore = signalScoreToGrowthScore(signalScore);
       const emailResults = await Promise.allSettled([
-        sendClientEmail(submission, signalScore as unknown as any, reportUrl),
-        sendAdminEmail(submission, signalScore as unknown as any, jobId, reportUrl),
+        sendClientEmail(submission, growthScore, reportUrl),
+        sendAdminEmail(submission, growthScore, jobId, reportUrl),
       ]);
       emailResults.forEach((result, idx) => {
         const recipient = idx === 0 ? submission.email : ADMIN_EMAIL;
