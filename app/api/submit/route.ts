@@ -26,7 +26,29 @@ function isValidUrl(url: string): boolean {
 }
 
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  // Basic RFC 5322 pattern
+  const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  if (!pattern.test(email)) return false;
+
+  // Reject disposable email domains (common spam)
+  const disposableDomains = [
+    'tempmail.com',
+    'throwaway.email',
+    '10minutemail.com',
+    'mailinator.com',
+    'guerrillamail.com',
+    'yopmail.com',
+    'temp-mail.org',
+    'trashmail.com',
+    'fakeinbox.com',
+  ];
+
+  const domain = email.split('@')[1]?.toLowerCase() || '';
+  if (disposableDomains.includes(domain)) {
+    return false;
+  }
+
+  return true;
 }
 
 function normalizeWebsite(url: string): string {
@@ -42,6 +64,54 @@ function extractDomain(url: string): string {
   } catch {
     return url;
   }
+}
+
+// ─── Fraud detection helper ───────────────────────────────────
+
+function isSuspiciousSubmission(
+  name: string,
+  email: string,
+  company: string,
+  website: string
+): { suspicious: boolean; reason?: string } {
+  // Check for suspicious patterns
+  const suspiciousKeywords = ['test', 'demo', 'example', 'admin', 'localhost', '127.0.0.1'];
+  const lowerEmail = email.toLowerCase();
+  const lowerName = name.toLowerCase();
+  const lowerCompany = company.toLowerCase();
+
+  // Email and name mismatch (name doesn't appear in email)
+  const nameInEmail = lowerEmail.split('@')[0]?.includes(lowerName.split(' ')[0]);
+  if (!nameInEmail && lowerName.length > 3) {
+    // Only flag if name is long enough to reasonably appear
+    // (short names like "Jo" might legitimately not be in email)
+  }
+
+  // Check for test/demo keywords
+  for (const keyword of suspiciousKeywords) {
+    if (
+      lowerCompany.includes(keyword) ||
+      lowerName.includes(keyword) ||
+      lowerEmail.includes(keyword)
+    ) {
+      return { suspicious: true, reason: `Contains test keyword: "${keyword}"` };
+    }
+  }
+
+  // Domain mismatch (email domain ≠ website domain)
+  const emailDomain = email.split('@')[1]?.toLowerCase() || '';
+  const siteDomain = extractDomain(website).toLowerCase();
+  if (
+    emailDomain &&
+    siteDomain &&
+    !emailDomain.includes(siteDomain.replace('www.', '')) &&
+    !siteDomain.includes(emailDomain.replace('www.', ''))
+  ) {
+    // This is a warning but not a blocker (common for agencies/consultants)
+    console.warn(`[submit] Domain mismatch - email: ${emailDomain}, website: ${siteDomain}`);
+  }
+
+  return { suspicious: false };
 }
 
 // ─── Background audit trigger ─────────────────────────────────
@@ -123,7 +193,19 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: errors.join(' ') }, { status: 422 });
   }
 
-  // ── Save submission ─────────────────────────────────────────
+  // ── Fraud detection ─────────────────────────────────────────
+  const fraud = isSuspiciousSubmission(name, email, company, website);
+  if (fraud.suspicious) {
+    console.warn(`[submit] Suspicious submission detected: ${fraud.reason}`, {
+      name,
+      email,
+      company,
+      ip,
+    });
+    // Still process it but log it for review
+  }
+
+  // ── Save submission with fraud flag ─────────────────────────
   const { data: submission, error: subError } = await supabase
     .from('intake_submissions')
     .insert({

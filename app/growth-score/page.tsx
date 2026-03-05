@@ -410,12 +410,55 @@ export default function GrowthScorePage() {
   const [loading,    setLoading]    = useState(false);
   const [error,      setError]      = useState('');
   const [shareToken, setShareToken] = useState('');
+  const [emailError, setEmailError] = useState('');
+
+  // Real-time email validation
+  const validateEmail = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) {
+      setEmailError('');
+      return;
+    }
+    
+    // Basic pattern check
+    const isValidPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(trimmed);
+    if (!isValidPattern) {
+      setEmailError('Please enter a valid email (e.g., jane@company.com)');
+      return;
+    }
+
+    // Check for disposable email domains
+    const disposableDomains = [
+      'tempmail.com',
+      'throwaway.email',
+      '10minutemail.com',
+      'mailinator.com',
+      'guerrillamail.com',
+      'yopmail.com',
+      'temp-mail.org',
+      'trashmail.com',
+      'fakeinbox.com',
+    ];
+
+    const domain = trimmed.split('@')[1]?.toLowerCase() || '';
+    if (disposableDomains.includes(domain)) {
+      setEmailError('Please use your work email address (temporary emails not allowed)');
+      return;
+    }
+
+    setEmailError('');
+  };
 
   const handleNext = () => {
     setError('');
     if (step === 1) {
       if (!name.trim() || !email.trim() || !company.trim() || !website.trim()) {
         setError('Please fill in all required fields.');
+        return;
+      }
+      // Check if email has validation errors
+      if (emailError) {
+        setError('Please fix the email address error before continuing.');
         return;
       }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -575,9 +618,29 @@ export default function GrowthScorePage() {
                         className={inputClass}
                         placeholder="jane@company.com"
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          validateEmail(e.target.value);
+                        }}
+                        onBlur={() => validateEmail(email)}
                         required
                       />
+                      {emailError && (
+                        <div className="text-xs text-red-600 font-medium mt-1 flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                          </svg>
+                          {emailError}
+                        </div>
+                      )}
+                      {email && !emailError && (
+                        <div className="text-xs text-green-600 font-medium mt-1 flex items-center gap-1">
+                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          Email looks good
+                        </div>
+                      )}
                     </Field>
                   </div>
                   <Field label="Company Name" required>
