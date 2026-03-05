@@ -186,13 +186,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }
 
     // ── Update job ─────────────────────────────────────────────
+    const growthScore = signalScoreToGrowthScore(signalScore);
     const { error: updateError } = await supabase
       .from('audit_jobs')
       .update({
         status: 'complete',
         finished_at: new Date().toISOString(),
         result: crawlResult as unknown as Record<string, unknown>,
-        score: signalScore as unknown as Record<string, unknown>,
+        score: growthScore as unknown as Record<string, unknown>,
         report_html: reportHtml,
       })
       .eq('id', jobId);
@@ -204,7 +205,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // ── Send emails ────────────────────────────────────────────
     try {
       console.log(`[audit] Sending emails to ${submission.email} and admin...`);
-      const growthScore = signalScoreToGrowthScore(signalScore);
       const emailResults = await Promise.allSettled([
         sendClientEmail(submission, growthScore, reportUrl),
         sendAdminEmail(submission, growthScore, jobId, reportUrl),
