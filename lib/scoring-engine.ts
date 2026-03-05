@@ -96,20 +96,20 @@ function scoreMeasurementMaturity(
 
   const details: ScoringDetail[] = [
     {
-      label: 'GA4 detected on site',
-      points: 5,
+      label: 'GA4 installed',
+      points: 8,
       earned: hasGA4,
       explanation: hasGA4
-        ? 'Google Analytics 4 tag found — baseline measurement in place.'
-        : 'No GA4 tag detected. Installing GA4 is the single highest-priority quick win.',
+        ? 'Google Analytics 4 is installed — essential measurement baseline.'
+        : 'No GA4 detected. GA4 is critical for understanding user behaviour and ROI.',
     },
     {
-      label: 'Tag Manager detected',
-      points: 5,
+      label: 'Tag Manager configured',
+      points: 4,
       earned: hasGTM,
       explanation: hasGTM
-        ? 'Google Tag Manager found — enables flexible tag governance.'
-        : 'GTM not detected. GTM unlocks scalable tracking without developer deploys.',
+        ? 'Google Tag Manager found — enables flexible tag governance without code deploys.'
+        : 'GTM is not required for small sites, but recommended for scalable tracking infrastructure.',
     },
     {
       label: 'Conversion tracking configured',
@@ -202,13 +202,15 @@ function scoreSearchOpportunity(result: CrawlResult): ScoringDetail[] {
         : 'No sitemap.xml found. A sitemap accelerates indexation of new and updated pages.',
     },
     {
-      label: 'Site depth (>10 pages)',
+      label: 'Site content depth',
       points: 5,
-      earned: total > 10,
+      earned: total >= 5, // Honest scoring: 5+ pages is reasonable
       explanation:
-        total > 10
-          ? `${total} pages crawled — sufficient content depth for topical authority.`
-          : `Only ${total} pages found. Expanding content depth is essential for competitive rankings.`,
+        total >= 10
+          ? `${total} pages crawled — strong content depth for topical authority.`
+          : total >= 5
+            ? `${total} pages found — sufficient content for SEO foundation. Growth will expand this.`
+            : `${total} pages found. Small sites need content strategy to scale organic visibility.`,
     },
     {
       label: 'Canonical tags present',

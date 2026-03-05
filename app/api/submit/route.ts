@@ -25,6 +25,64 @@ function isValidUrl(url: string): boolean {
   }
 }
 
+// ─── Domain validation ─────────────────────────────────────────
+
+async function validateDomainExists(url: string): Promise<{ valid: boolean; error?: string }> {
+  try {
+    const fullUrl = url.startsWith('http') ? url : `https://${url}`;
+    const parsed = new URL(fullUrl);
+    const hostname = parsed.hostname || parsed.host;
+
+    if (!hostname) {
+      return { valid: false, error: 'Invalid hostname' };
+    }
+
+    // Try to fetch the domain with a HEAD request
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+    try {
+      const response = await fetch(fullUrl, {
+        method: 'HEAD',
+        redirect: 'follow',
+        signal: controller.signal,
+        headers: {
+          'User-Agent': 'AlphaCreative-GIE/1.0 (+https://thealphacreative.com)',
+        },
+      });
+      clearTimeout(timeout);
+
+      // Accept any response (2xx, 3xx, 4xx) - domain exists if we get a response
+      return { valid: response.status !== 404 && response.status !== 410 };
+    } catch (fetchErr) {
+      clearTimeout(timeout);
+      
+      // Try GET as fallback
+      try {
+        const getResponse = await fetch(fullUrl, {
+          method: 'GET',
+          redirect: 'follow',
+          signal: AbortSignal.timeout(5000),
+          headers: {
+            'User-Agent': 'AlphaCreative-GIE/1.0 (+https://thealphacreative.com)',
+          },
+        });
+        return { valid: getResponse.status !== 404 && getResponse.status !== 410 };
+      } catch {
+        return { 
+          valid: false, 
+          error: 'Unable to connect to domain. Ensure it is publicly accessible.' 
+        };
+      }
+    }
+  } catch (err) {
+    return { 
+      valid: false, 
+      error: 'Invalid URL format' 
+    };
+  }
+}
+
 function isValidEmail(email: string): boolean {
   // Basic RFC 5322 pattern
   const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -193,7 +251,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: errors.join(' ') }, { status: 422 });
   }
 
-  // ── Fraud detection ─────────────────────────────────────────
+  // ── Domain validation (actually verify domain is accessible) ──
+  console.log(`[submit] Validating domain: ${website}`);
+  const domainCheck = await validateDomainExists(website);
+  if (!domainCheck.valid) {
+    return NextResponse.json(
+      { 
+        error: `Website validation failed: ${domainCheck.error || 'Domain is not accessible. Please verify the URL is correct and publicly accessible.'}` 
+      }, 
+      { status: 422 }
+    );
+  }
+  console.log(`[submit] Domain validated successfully: ${website}`);
   const fraud = isSuspiciousSubmission(name, email, company, website);
   if (fraud.suspicious) {
     console.warn(`[submit] Suspicious submission detected: ${fraud.reason}`, {
