@@ -8,7 +8,7 @@ import type { GrowthScore, IntakeSubmission } from '@/types';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM = process.env.EMAIL_FROM ?? 'josethealphacreative.com';
+const FROM = process.env.EMAIL_FROM ?? 'jose@thealphacreative.com';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'jose@thealphacreative.com';
 
 // ─── Tier colours ─────────────────────────────────────────────
