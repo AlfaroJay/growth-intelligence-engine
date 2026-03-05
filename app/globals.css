@@ -2,10 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --font-inter: 'Inter', system-ui, sans-serif;
+  --font-inter:   'Inter', system-ui, sans-serif;
+  --font-display: 'Nunito', 'Inter', system-ui, sans-serif;
+
+  /* AlphaCreative brand colors */
+  --brand-navy:       #001D3D;
+  --brand-deep-navy:  #000F1F;
+  --brand-gold:       #FCBA12;
+  --brand-white:      #FFFFFF;
+  --brand-bg:         #f8f8f6;
+
+  /* Hero: solid deep navy with subtle dot texture */
+  --hero-bg: #000F1F;
 }
 
 html {
@@ -16,6 +27,79 @@ body {
   font-family: var(--font-inter);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--brand-bg);
+}
+
+/* Utility: apply display font to headings */
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Hero section: deep navy + subtle gold dot grid */
+.hero-navy {
+  background: var(--brand-deep-navy);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-navy::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(252, 186, 18, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+/* AlphaCreative button styles */
+.btn-alpha-gold {
+  background-color: var(--brand-gold);
+  color: var(--brand-navy);
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(252, 186, 18, 0.2);
+}
+
+.btn-alpha-gold:hover {
+  background-color: #e0a40e;
+  box-shadow: 0 6px 16px rgba(252, 186, 18, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-alpha-navy {
+  background-color: var(--brand-navy);
+  color: var(--brand-white);
+  font-weight: 700;
+  transition: all 0.2s ease;
+  border: 2px solid var(--brand-navy);
+}
+
+.btn-alpha-navy:hover {
+  background-color: var(--brand-deep-navy);
+  border-color: var(--brand-gold);
+  box-shadow: 0 4px 12px rgba(0, 29, 61, 0.2);
+}
+
+/* Input focus styling with gold accent */
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(252, 186, 18, 0.2), 0 0 0 1px var(--brand-gold);
+  border-color: var(--brand-gold) !important;
+}
+
+/* Selection highlight */
+::selection {
+  background-color: var(--brand-gold);
+  color: var(--brand-navy);
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, color, box-shadow;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
 }
 
 /* Custom progress ring animation */
@@ -23,4 +107,15 @@ body {
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* Gold glow pulse for the score badge */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 186, 18, 0.2); }
+  50%       { box-shadow: 0 0 32px 8px rgba(252, 186, 18, 0.12); }
+}
+
+/* Warm off-white background for light sections (matches brand guide page bg) */
+.bg-brand-cream {
+  background-color: #faf8f3;
 }

@@ -124,12 +124,10 @@ function pillarSection(
 // ─── Priority action card ─────────────────────────────────────
 
 function actionCard(action: string, index: number): string {
-  const colors = ['#4f46e5', '#0891b2', '#16a34a', '#d97706', '#dc2626'];
-  const color = colors[index % colors.length];
   return `
-  <div style="display:flex;align-items:flex-start;gap:12px;padding:14px;background:#f9fafb;border-left:4px solid ${color};border-radius:4px;margin-bottom:10px;">
-    <div style="background:${color};color:#fff;font-size:12px;font-weight:700;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${index + 1}</div>
-    <div style="font-size:13px;color:#374151;">${action}</div>
+  <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:#fffdf0;border:1px solid rgba(252,186,18,0.3);border-radius:10px;margin-bottom:8px;">
+    <div style="background:#001D3D;color:#FCBA12;font-size:11px;font-weight:800;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">${index + 1}</div>
+    <div style="font-size:13px;color:#374151;line-height:1.45;">${action}</div>
   </div>`;
 }
 
@@ -163,7 +161,7 @@ export function generateReport(
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>${submission.company} – AlphaCreative Growth Score Report</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
     body{font-family:'Inter',sans-serif;background:#f9fafb;color:#111827;line-height:1.5;}
@@ -175,10 +173,23 @@ export function generateReport(
   <div class="container">
 
     <!-- Header -->
-    <div style="text-align:center;margin-bottom:40px;">
-      <div style="font-size:13px;text-transform:uppercase;letter-spacing:2px;color:#6b7280;margin-bottom:8px;">AlphaCreative</div>
-      <h1 style="font-size:28px;font-weight:800;color:#111827;margin-bottom:4px;">Growth Intelligence Report</h1>
-      <div style="font-size:14px;color:#6b7280;">${submission.company} &middot; ${submission.website} &middot; ${new Date(score.scored_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
+    <div style="text-align:center;padding:32px 24px 28px;background:#000F1F;border-radius:16px;margin-bottom:32px;position:relative;overflow:hidden;">
+      <!-- Dot grid texture -->
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(252,186,18,0.07) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;"></div>
+      <!-- Gold orb -->
+      <div style="position:absolute;top:0;right:0;width:200px;height:200px;background:radial-gradient(circle,rgba(252,186,18,0.14) 0%,transparent 65%);transform:translate(30%,-30%);pointer-events:none;"></div>
+      <!-- aC monogram + wordmark -->
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:16px;position:relative;">
+        <div style="background:#FCBA12;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="font-family:'Nunito',Inter,sans-serif;font-size:15px;font-weight:900;color:#001D3D;letter-spacing:-0.03em;">aC</span>
+        </div>
+        <div style="display:flex;flex-direction:column;line-height:1;font-family:'Nunito',Inter,sans-serif;">
+          <span style="font-size:18px;font-weight:800;color:#FCBA12;letter-spacing:-0.03em;line-height:1;">alpha</span>
+          <span style="font-size:10px;font-weight:700;color:#fff;letter-spacing:0.12em;line-height:1.3;">CREATIVE</span>
+        </div>
+      </div>
+      <h1 style="font-family:'Nunito',Inter,sans-serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:6px;letter-spacing:-0.025em;position:relative;">Growth Intelligence Report</h1>
+      <div style="font-size:13px;color:rgba(252,186,18,0.75);position:relative;">${submission.company} &middot; ${submission.website} &middot; ${new Date(score.scored_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</div>
     </div>
 
     <!-- Score card -->
@@ -227,20 +238,24 @@ export function generateReport(
     </div>
 
     <!-- CTA -->
-    <div style="background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);border-radius:16px;padding:36px 32px;text-align:center;margin-bottom:32px;">
-      <h2 style="font-size:22px;font-weight:800;color:#fff;margin-bottom:8px;">Ready to move from diagnostic to execution?</h2>
-      <p style="font-size:14px;color:rgba(255,255,255,.85);margin-bottom:24px;">Book a 30-minute strategy call with the AlphaCreative team. We'll walk through your score, prioritise your roadmap, and outline what a partnership looks like.</p>
+    <div style="background:#000F1F;border-radius:16px;padding:36px 32px;text-align:center;margin-bottom:32px;position:relative;overflow:hidden;">
+      <!-- Dot grid -->
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(252,186,18,0.07) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;"></div>
+      <!-- Gold orb -->
+      <div style="position:absolute;bottom:0;left:50%;transform:translateX(-50%) translateY(40%);width:280px;height:280px;background:radial-gradient(circle,rgba(252,186,18,0.14) 0%,transparent 65%);pointer-events:none;"></div>
+      <h2 style="font-family:'Nunito',Inter,sans-serif;font-size:22px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:-0.02em;position:relative;">Ready to move from diagnostic to execution?</h2>
+      <p style="font-size:14px;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.5;position:relative;">Book a 30-minute strategy call with the AlphaCreative team. We'll walk through your score, prioritise your roadmap, and outline what a partnership looks like.</p>
       <a href="https://alphacreative.as.me/"
-        style="display:inline-block;background:#fff;color:#4f46e5;font-weight:700;font-size:15px;padding:14px 32px;border-radius:8px;text-decoration:none;">
+        style="display:inline-block;background:#FCBA12;color:#001D3D;font-family:'Nunito',Inter,sans-serif;font-weight:800;font-size:15px;padding:14px 32px;border-radius:10px;text-decoration:none;letter-spacing:-0.01em;position:relative;">
         Book Your Strategy Call →
       </a>
     </div>
 
     <!-- Footer -->
     <div style="text-align:center;font-size:12px;color:#9ca3af;padding-top:8px;">
-      <p>AlphaCreative · <a href="https://thealphacreative.com" style="color:#9ca3af;">thealphacreative.com</a></p>
+      <p>AlphaCreative · <a href="https://thealphacreative.com" style="color:#FCBA12;text-decoration:none;">thealphacreative.com</a></p>
       <p style="margin-top:4px;">Report ID: ${reportUrl.split('/').pop()} &middot; Powered by AC-GIE-v1.0</p>
-      <p style="margin-top:4px;"><a href="${reportUrl}" style="color:#6366f1;">View this report online</a></p>
+      <p style="margin-top:4px;"><a href="${reportUrl}" style="color:#FCBA12;text-decoration:none;">View this report online →</a></p>
     </div>
 
   </div>

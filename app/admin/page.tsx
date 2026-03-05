@@ -131,7 +131,7 @@ function JobDetail({
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-3">Score Summary</h3>
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="text-4xl font-extrabold text-brand-600">
+                    <div className="text-4xl font-extrabold" style={{ color: NAVY }}>
                       {job.score.total}
                       <span className="text-lg text-gray-400">/100</span>
                     </div>
@@ -169,7 +169,7 @@ function JobDetail({
                         {(detail.pages as Record<string, unknown>[]).slice(0, 25).map((p, i) => (
                           <tr key={i} className="border-b border-gray-50 hover:bg-gray-50">
                             <td className="px-3 py-2 max-w-xs truncate text-brand-600">
-                              <a href={p.url as string} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                              <a href={p.url as string} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: NAVY }}>
                                 {(p.url as string).replace(/^https?:\/\/[^/]+/, '')}
                               </a>
                             </td>
@@ -201,7 +201,8 @@ function JobDetail({
                   href={`/report/${job.share_token}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-brand-600 text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-brand-700 transition"
+                  className="text-sm font-semibold px-4 py-2 rounded-lg transition hover:opacity-90"
+                  style={{ background: GOLD, color: NAVY, fontFamily: NUNITO }}
                 >
                   View Report →
                 </a>
@@ -219,6 +220,12 @@ function JobDetail({
     </div>
   );
 }
+
+// ─── Brand constants ────────────────────────────────────────────
+const NAVY      = '#001D3D';
+const DEEP_NAVY = '#000F1F';
+const GOLD      = '#FCBA12';
+const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 
 // ─── Admin page ───────────────────────────────────────────────
 
@@ -257,12 +264,51 @@ export default function AdminPage() {
   // ── Login screen ───────────────────────────────────────────
   if (!authed) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
-          <div className="text-center mb-6">
-            <div className="text-2xl mb-2">🔐</div>
-            <h1 className="text-xl font-bold text-gray-900">Admin Portal</h1>
-            <p className="text-gray-500 text-sm">AlphaCreative GIE</p>
+      <div
+        className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
+        style={{ background: DEEP_NAVY }}
+      >
+        {/* Gold orb */}
+        <div
+          className="absolute top-0 right-0 w-96 h-96 pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, rgba(252,186,18,0.12) 0%, transparent 65%)',
+            transform: 'translate(25%, -30%)',
+          }}
+        />
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(252,186,18,0.06) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+        />
+
+        <div className="relative z-10 bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8">
+          <div className="text-center mb-7">
+            {/* aC monogram + wordmark */}
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ background: NAVY }}
+                >
+                  <span style={{ fontFamily: NUNITO, fontSize: '15px', color: GOLD, fontWeight: 900, letterSpacing: '-0.03em' }}>aC</span>
+                </div>
+                <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
+                  <span style={{ fontSize: '17px', fontWeight: 800, color: GOLD, letterSpacing: '-0.03em', lineHeight: 1 }}>alpha</span>
+                  <span style={{ fontSize: '10px', fontWeight: 700, color: NAVY, letterSpacing: '0.12em', lineHeight: 1.2 }}>CREATIVE</span>
+                </div>
+              </div>
+            </div>
+            <h1
+              className="text-lg font-extrabold"
+              style={{ fontFamily: NUNITO, color: NAVY }}
+            >
+              Admin Portal
+            </h1>
+            <p className="text-gray-400 text-sm mt-1">Growth Intelligence Engine</p>
           </div>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
@@ -270,15 +316,17 @@ export default function AdminPage() {
               placeholder="Admin password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500"
+              className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 shadow-sm"
+              style={{ '--tw-ring-color': NAVY } as React.CSSProperties}
               autoFocus
             />
             {authError && (
-              <p className="text-red-600 text-sm">{authError}</p>
+              <p className="text-red-600 text-sm font-medium">{authError}</p>
             )}
             <button
               type="submit"
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-2.5 rounded-lg transition"
+              className="w-full font-bold py-2.5 rounded-xl transition hover:opacity-90 shadow-sm"
+              style={{ background: GOLD, color: NAVY, fontFamily: NUNITO }}
             >
               Sign In
             </button>
@@ -314,15 +362,30 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gray-900 text-white px-6 py-5">
+      <div className="text-white px-6 py-5" style={{ background: NAVY }}>
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div>
-            <div className="text-xs text-gray-400 uppercase tracking-widest mb-0.5">AlphaCreative</div>
-            <h1 className="text-xl font-bold">Growth Intelligence Admin</h1>
+          <div className="flex items-center gap-3">
+            {/* aC monogram */}
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: GOLD }}
+            >
+              <span style={{ fontFamily: NUNITO, fontSize: '14px', color: NAVY, fontWeight: 900, letterSpacing: '-0.03em' }}>aC</span>
+            </div>
+            <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
+              <span style={{ fontSize: '13px', fontWeight: 700, color: GOLD, letterSpacing: '0.08em', lineHeight: 1 }}>alpha CREATIVE</span>
+              <h1
+                className="text-base font-extrabold leading-none mt-0.5"
+                style={{ fontFamily: NUNITO, letterSpacing: '-0.02em', color: '#fff' }}
+              >
+                Growth Intelligence Admin
+              </h1>
+            </div>
           </div>
           <button
             onClick={() => { setAuthed(false); setJobs([]); }}
-            className="text-gray-400 hover:text-white text-sm"
+            className="text-sm font-medium transition hover:opacity-70"
+            style={{ color: GOLD, fontFamily: NUNITO }}
           >
             Sign out
           </button>
@@ -356,11 +419,13 @@ export default function AdminPage() {
                 placeholder="Search company, email, domain…"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 w-64"
+                className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none w-64"
+                style={{ outlineColor: NAVY } as React.CSSProperties}
               />
               <button
                 onClick={() => fetchJobs(password)}
-                className="text-sm text-brand-600 hover:text-brand-800 font-medium"
+                className="text-sm font-medium hover:opacity-70 transition"
+                style={{ color: NAVY }}
               >
                 ↻ Refresh
               </button>
@@ -398,7 +463,7 @@ export default function AdminPage() {
                       <td className="px-4 py-3 font-medium text-gray-900">{job.company}</td>
                       <td className="px-4 py-3 text-gray-500">{job.domain}</td>
                       <td className="px-4 py-3"><StatusBadge status={job.status} /></td>
-                      <td className="px-4 py-3 font-bold text-brand-600">
+                      <td className="px-4 py-3 font-bold" style={{ color: NAVY }}>
                         {job.score ? `${job.score.total}/100` : '—'}
                       </td>
                       <td className="px-4 py-3">
@@ -406,7 +471,7 @@ export default function AdminPage() {
                       </td>
                       <td className="px-4 py-3 text-gray-500 text-xs">{job.budget}</td>
                       <td className="px-4 py-3">
-                        <button className="text-brand-600 hover:text-brand-800 text-xs font-medium">
+                        <button className="text-xs font-medium hover:opacity-70 transition" style={{ color: NAVY }}>
                           View →
                         </button>
                       </td>

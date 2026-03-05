@@ -9,34 +9,37 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // AlphaCreative brand palette — Navy Blue
         brand: {
-          50:  '#f0f4ff',
-          100: '#e0e9ff',
-          200: '#c7d7fe',
-          300: '#a5b8fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50:  '#f0f4fa',
+          100: '#dce8f5',
+          200: '#b8d0eb',
+          300: '#85aed8',
+          400: '#4f86bf',
+          500: '#2b64a3',
+          600: '#1a4d87',
+          700: '#001D3D', // Navy Blue — primary brand color
+          800: '#001630',
+          900: '#000F1F', // Deep Navy
+          950: '#000912',
         },
+        // Alpha Gold accent
         accent: {
-          50:  '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#f97316',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          50:  '#fffdf0',
+          100: '#fef9d3',
+          200: '#fef0a0',
+          300: '#fde168',
+          400: '#fccf30',
+          500: '#FCBA12', // Alpha Gold — primary accent
+          600: '#e0a40e',
+          700: '#c48f0b',
+          800: '#a87909',
+          900: '#8c6407',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Nunito"', 'Inter', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -56,38 +56,124 @@ const ROLES = [
   'Other',
 ];
 
-// ─── Step indicator ───────────────────────────────────────────
+// ─── Brand constants ────────────────────────────────────────────
+const NAVY      = '#001D3D';
+const DEEP_NAVY = '#000F1F';
+const GOLD      = '#FCBA12';
+const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 
-function StepIndicator({ current, total }: { current: number; total: number }) {
+// ─── AlphaCreative Logo ─────────────────────────────────────────
+// Matches brand guide: aC monogram mark + "alpha CREATIVE" wordmark
+
+function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
+  const isLight = variant === 'light'; // light = on dark background
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
-      {Array.from({ length: total }).map((_, i) => (
-        <div key={i} className="flex items-center gap-2">
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-              i + 1 < current
-                ? 'bg-brand-600 text-white'
-                : i + 1 === current
-                ? 'bg-brand-600 text-white ring-4 ring-brand-100'
-                : 'bg-gray-200 text-gray-500'
-            }`}
-          >
-            {i + 1 < current ? '✓' : i + 1}
-          </div>
-          {i < total - 1 && (
-            <div
-              className={`h-0.5 w-12 transition-all ${
-                i + 1 < current ? 'bg-brand-600' : 'bg-gray-200'
-              }`}
-            />
-          )}
-        </div>
-      ))}
+    <div className="flex items-center gap-3">
+      {/* aC monogram icon */}
+      <div
+        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+        style={{
+          background: isLight ? GOLD : NAVY,
+          boxShadow: isLight ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`,
+        }}
+      >
+        <span
+          style={{
+            fontFamily: NUNITO,
+            fontSize: '15px',
+            lineHeight: 1,
+            color: isLight ? NAVY : GOLD,
+            fontWeight: 900,
+            letterSpacing: '-0.03em',
+          }}
+        >
+          aC
+        </span>
+      </div>
+      {/* Wordmark: "alpha" + "CREATIVE" */}
+      <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
+        <span
+          style={{
+            fontSize: '17px',
+            fontWeight: 800,
+            color: isLight ? GOLD : NAVY,
+            letterSpacing: '-0.03em',
+            lineHeight: 1,
+          }}
+        >
+          alpha
+        </span>
+        <span
+          style={{
+            fontSize: '10px',
+            fontWeight: 700,
+            color: isLight ? '#ffffff' : NAVY,
+            letterSpacing: '0.12em',
+            lineHeight: 1.2,
+          }}
+        >
+          CREATIVE
+        </span>
+      </div>
     </div>
   );
 }
 
-// ─── Form field components ────────────────────────────────────
+// ─── Step indicator ─────────────────────────────────────────────
+
+const STEP_LABELS = ['Your Info', 'Growth Goals', 'Where You Are'];
+
+function StepIndicator({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex items-center justify-center gap-0 mb-8">
+      {Array.from({ length: total }).map((_, i) => {
+        const stepNum = i + 1;
+        const isPast   = stepNum < current;
+        const isActive = stepNum === current;
+        const isFuture = stepNum > current;
+
+        return (
+          <div key={i} className="flex items-center">
+            {i > 0 && (
+              <div
+                className="h-px w-10 sm:w-16 transition-all"
+                style={{ background: isPast ? NAVY : '#e5e7eb' }}
+              />
+            )}
+            <div className="flex flex-col items-center gap-1.5">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all"
+                style={{
+                  background: isPast || isActive ? NAVY : '#f3f4f6',
+                  color:      isPast || isActive ? '#ffffff' : '#9ca3af',
+                  boxShadow:  isActive ? `0 0 0 4px rgba(252,186,18,0.3)` : 'none',
+                  outline:    isActive ? `2px solid ${GOLD}` : 'none',
+                  outlineOffset: '2px',
+                }}
+              >
+                {isPast ? (
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  stepNum
+                )}
+              </div>
+              <span
+                className="text-xs font-medium hidden sm:block transition-all"
+                style={{ color: isFuture ? '#9ca3af' : NAVY }}
+              >
+                {STEP_LABELS[i]}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ─── Form field components ──────────────────────────────────────
 
 function Field({
   label,
@@ -100,9 +186,9 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-gray-700">
+      <label className="text-sm font-semibold" style={{ color: NAVY }}>
         {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
+        {required && <span style={{ color: GOLD }} className="ml-1">*</span>}
       </label>
       {children}
     </div>
@@ -110,9 +196,9 @@ function Field({
 }
 
 const inputClass =
-  'w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition placeholder:text-gray-400';
+  'w-full border border-gray-300 rounded-lg px-3.5 py-2.5 text-sm focus:outline-none transition placeholder:text-gray-400 bg-white shadow-sm hover:border-gray-400';
 
-const selectClass = inputClass + ' bg-white';
+const selectClass = inputClass;
 
 function MultiSelect({
   options,
@@ -133,20 +219,25 @@ function MultiSelect({
 
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-${cols} gap-2`}>
-      {options.map((opt) => (
-        <button
-          key={opt}
-          type="button"
-          onClick={() => toggle(opt)}
-          className={`text-left text-sm px-3.5 py-2.5 rounded-lg border transition-all ${
-            value.includes(opt)
-              ? 'bg-brand-600 text-white border-brand-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-brand-400'
-          }`}
-        >
-          {opt}
-        </button>
-      ))}
+      {options.map((opt) => {
+        const isSelected = value.includes(opt);
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => toggle(opt)}
+            className="text-left text-sm px-3.5 py-2.5 rounded-xl border transition-all font-medium shadow-sm"
+            style={{
+              background:   isSelected ? NAVY : '#ffffff',
+              color:        isSelected ? GOLD : '#374151',
+              borderColor:  isSelected ? NAVY : '#e5e7eb',
+              fontWeight:   isSelected ? 700 : 500,
+            }}
+          >
+            {opt}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -162,98 +253,162 @@ function SingleSelect({
 }) {
   return (
     <div className="grid grid-cols-1 gap-2">
-      {options.map((opt) => (
-        <button
-          key={opt}
-          type="button"
-          onClick={() => onChange(opt)}
-          className={`text-left text-sm px-3.5 py-2.5 rounded-lg border transition-all ${
-            value === opt
-              ? 'bg-brand-600 text-white border-brand-600'
-              : 'bg-white text-gray-700 border-gray-300 hover:border-brand-400'
-          }`}
-        >
-          {opt}
-        </button>
-      ))}
+      {options.map((opt) => {
+        const isSelected = value === opt;
+        return (
+          <button
+            key={opt}
+            type="button"
+            onClick={() => onChange(opt)}
+            className="text-left text-sm px-3.5 py-2.5 rounded-xl border transition-all shadow-sm"
+            style={{
+              background:  isSelected ? NAVY : '#ffffff',
+              color:       isSelected ? GOLD : '#374151',
+              borderColor: isSelected ? NAVY : '#e5e7eb',
+              fontWeight:  isSelected ? 700 : 500,
+            }}
+          >
+            {opt}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-// ─── Success screen ───────────────────────────────────────────
+// ─── Success screen ─────────────────────────────────────────────
 
 function SuccessScreen({ shareToken }: { shareToken: string }) {
   const [secondsLeft, setSecondsLeft] = useState(5);
 
-  // Auto-close window after 5 seconds
   useEffect(() => {
     if (secondsLeft <= 0) {
       window.close();
       return;
     }
-
     const timer = setInterval(() => {
       setSecondsLeft((prev) => prev - 1);
     }, 1000);
-
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
+  void shareToken;
+
   return (
-    <div className="text-center py-12">
-      <div className="text-6xl mb-6">✅</div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-3">
-        Your Growth Score is being generated!
+    <div className="text-center py-6 px-2">
+      {/* Gold checkmark circle with shadow */}
+      <div
+        className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 flex-shrink-0"
+        style={{ 
+          background: GOLD,
+          boxShadow: `0 8px 24px rgba(252, 186, 18, 0.25)`,
+        }}
+      >
+        <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke={NAVY} strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+
+      <h2
+        className="text-3xl font-extrabold mb-4 leading-tight"
+        style={{ fontFamily: NUNITO, color: NAVY, letterSpacing: '-0.02em' }}
+      >
+        Score Generated!
       </h2>
-      <p className="text-gray-500 text-base max-w-md mx-auto mb-8">
-        We&apos;re auditing your website right now. Check your inbox — your personalized
-        Growth Score report and actionable insights will arrive within the next few minutes.
+      <p className="text-gray-600 text-base max-w-sm mx-auto mb-10 leading-relaxed font-medium">
+        Check your inbox for your personalized Growth Score report and actionable insights.
       </p>
 
-      <div className="flex flex-col gap-3 items-center max-w-sm mx-auto">
+      <div className="flex flex-col gap-3 items-center max-w-xs mx-auto">
         <a
           href="https://alphacreative.as.me/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-3 rounded-lg transition"
+          className="w-full inline-flex items-center justify-center gap-2 font-bold px-6 py-4 rounded-xl transition shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95"
+          style={{ 
+            background: GOLD, 
+            color: NAVY, 
+            fontFamily: NUNITO,
+            fontWeight: 800,
+            letterSpacing: '-0.01em',
+          }}
         >
           Book Your Strategy Call →
         </a>
         <button
           onClick={() => window.close()}
-          className="text-sm text-gray-400 hover:text-gray-600 transition"
+          className="text-sm text-gray-500 hover:text-gray-700 transition font-medium"
         >
           Close this window
         </button>
         <p className="text-xs text-gray-400 mt-2">
-          Window closes automatically in {secondsLeft} second{secondsLeft !== 1 ? 's' : ''}...
+          Closes automatically in {secondsLeft} second{secondsLeft !== 1 ? 's' : ''}…
         </p>
       </div>
     </div>
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────
+// ─── Decorative gold orbs (subtle) ─────────────────────────────
+
+function HeroOrbs() {
+  return (
+    <>
+      <div
+        className="absolute top-0 right-0 w-[480px] h-[480px] pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(252,186,18,0.12) 0%, transparent 65%)',
+          transform: 'translate(30%, -25%)',
+        }}
+      />
+      <div
+        className="absolute bottom-0 left-0 w-72 h-72 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(252,186,18,0.07) 0%, transparent 70%)',
+          transform: 'translate(-30%, 30%)',
+        }}
+      />
+    </>
+  );
+}
+
+// ─── Trust pill ─────────────────────────────────────────────────
+
+function TrustPill() {
+  return (
+    <div
+      className="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs font-semibold mb-6"
+      style={{
+        background: 'rgba(252,186,18,0.12)',
+        border: '1px solid rgba(252,186,18,0.3)',
+        color: GOLD,
+      }}
+    >
+      <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
+      Free 2-minute assessment · No credit card required
+    </div>
+  );
+}
+
+// ─── Main page ──────────────────────────────────────────────────
 
 export default function GrowthScorePage() {
   const [step, setStep] = useState(1);
   const TOTAL_STEPS = 3;
 
-  // Form state
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [company, setCompany] = useState('');
-  const [website, setWebsite] = useState('');
-  const [role, setRole] = useState('');
+  const [name,     setName]     = useState('');
+  const [email,    setEmail]    = useState('');
+  const [company,  setCompany]  = useState('');
+  const [website,  setWebsite]  = useState('');
+  const [role,     setRole]     = useState('');
   const [services, setServices] = useState<string[]>([]);
-  const [budget, setBudget] = useState('');
+  const [budget,   setBudget]   = useState('');
   const [timeline, setTimeline] = useState('');
   const [tracking, setTracking] = useState('');
   const [channels, setChannels] = useState<string[]>([]);
 
-  // UI state
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [loading,    setLoading]    = useState(false);
+  const [error,      setError]      = useState('');
   const [shareToken, setShareToken] = useState('');
 
   const handleNext = () => {
@@ -302,7 +457,6 @@ export default function GrowthScorePage() {
           timeline,
           tracking_maturity: tracking,
           marketing_channels: channels,
-          // Honeypot field (intentionally empty for real users)
           website_confirm: '',
         }),
       });
@@ -322,46 +476,76 @@ export default function GrowthScorePage() {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────
+  // ── Success state ──────────────────────────────────────────────
 
   if (shareToken) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8">
+      <div
+        className="min-h-screen flex items-center justify-center p-4 relative hero-navy"
+        style={{ background: DEEP_NAVY }}
+      >
+        <HeroOrbs />
+        <div className="relative z-10 bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 sm:p-12 border border-gray-100">
+          <div className="flex justify-center mb-8">
+            <AlphaLogo variant="dark" />
+          </div>
           <SuccessScreen shareToken={shareToken} />
         </div>
       </div>
     );
   }
 
+  // ── Render form ────────────────────────────────────────────────
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800">
-      {/* Header */}
-      <div className="text-center pt-12 pb-8 px-4">
-        <div className="text-brand-300 text-xs tracking-widest uppercase mb-3">
-          AlphaCreative
+    <div
+      className="min-h-screen relative hero-navy"
+      style={{ background: DEEP_NAVY }}
+    >
+      <HeroOrbs />
+
+      {/* Hero header */}
+      <div className="relative z-10 text-center pt-12 pb-8 px-4">
+        <div className="flex justify-center mb-6">
+          <AlphaLogo variant="light" />
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">
+
+        <TrustPill />
+
+        <h1
+          className="text-3xl sm:text-4xl lg:text-[2.75rem] font-extrabold text-white mb-4 leading-tight"
+          style={{
+            fontFamily: NUNITO,
+            letterSpacing: '-0.03em',
+            lineHeight: 1.1,
+          }}
+        >
           Growth Intelligence Engine
         </h1>
-        <p className="text-brand-200 text-base max-w-xl mx-auto">
+        <p className="text-base max-w-lg mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.65)' }}>
           Get your free Digital Growth Score — a diagnostic audit of your website,
-          search presence, and measurement maturity. Takes 2 minutes.
+          search presence, and measurement maturity.
         </p>
       </div>
 
-      {/* Card */}
-      <div className="max-w-xl mx-auto px-4 pb-16">
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="p-8">
+      {/* Form card */}
+      <div className="relative z-10 max-w-xl mx-auto px-4 pb-16">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+          <div className="p-8 sm:p-10">
             <StepIndicator current={step} total={TOTAL_STEPS} />
 
-            {/* Step labels */}
+            {/* Step header */}
             <div className="text-center mb-8">
-              <div className="text-xs text-gray-500 uppercase tracking-widest mb-1">
+              <div
+                className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full mb-3"
+                style={{ background: 'rgba(252,186,18,0.12)', color: '#a07800' }}
+              >
                 Step {step} of {TOTAL_STEPS}
               </div>
-              <h2 className="text-xl font-bold text-gray-900">
+              <h2
+                className="text-xl font-extrabold"
+                style={{ fontFamily: NUNITO, color: NAVY, letterSpacing: '-0.02em' }}
+              >
                 {step === 1 && 'Tell us about yourself'}
                 {step === 2 && 'What are your growth goals?'}
                 {step === 3 && 'Where are you today?'}
@@ -378,6 +562,7 @@ export default function GrowthScorePage() {
                       <input
                         type="text"
                         className={inputClass}
+                        style={{ '--tw-ring-color': NAVY } as React.CSSProperties}
                         placeholder="Jane Smith"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -428,7 +613,7 @@ export default function GrowthScorePage() {
                     </select>
                   </Field>
 
-                  {/* Honeypot – hidden from real users */}
+                  {/* Honeypot */}
                   <div className="hidden" aria-hidden="true">
                     <input
                       type="text"
@@ -489,9 +674,9 @@ export default function GrowthScorePage() {
                 </div>
               )}
 
-              {/* Error message */}
+              {/* Error */}
               {error && (
-                <div className="mt-4 bg-red-50 text-red-700 text-sm rounded-lg px-4 py-3 border border-red-200">
+                <div className="mt-4 bg-red-50 text-red-700 text-sm rounded-xl px-4 py-3 border border-red-100 font-medium">
                   {error}
                 </div>
               )}
@@ -502,7 +687,8 @@ export default function GrowthScorePage() {
                   <button
                     type="button"
                     onClick={() => setStep((s) => s - 1)}
-                    className="text-sm text-gray-500 hover:text-gray-700 font-medium transition"
+                    className="text-sm font-semibold transition flex items-center gap-1 hover:text-opacity-70 duration-200"
+                    style={{ color: NAVY }}
                   >
                     ← Back
                   </button>
@@ -514,7 +700,14 @@ export default function GrowthScorePage() {
                   <button
                     type="button"
                     onClick={handleNext}
-                    className="bg-brand-600 hover:bg-brand-700 text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm"
+                    className="font-bold px-8 py-3 rounded-xl transition text-sm shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95"
+                    style={{ 
+                      background: GOLD, 
+                      color: NAVY, 
+                      fontFamily: NUNITO,
+                      fontWeight: 800,
+                      letterSpacing: '-0.01em',
+                    }}
                   >
                     Continue →
                   </button>
@@ -522,7 +715,14 @@ export default function GrowthScorePage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="bg-brand-600 hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold px-6 py-2.5 rounded-lg transition text-sm flex items-center gap-2"
+                    className="font-bold px-8 py-3 rounded-xl transition text-sm shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                    style={{ 
+                      background: loading ? '#daa510' : GOLD, 
+                      color: NAVY, 
+                      fontFamily: NUNITO,
+                      fontWeight: 800,
+                      letterSpacing: '-0.01em',
+                    }}
                   >
                     {loading ? (
                       <>
@@ -530,10 +730,10 @@ export default function GrowthScorePage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
                         </svg>
-                        Generating Report…
+                        Generating…
                       </>
                     ) : (
-                      'Email Me My Results! →'
+                      'Get My Results! →'
                     )}
                   </button>
                 )}
@@ -541,10 +741,13 @@ export default function GrowthScorePage() {
             </form>
           </div>
 
-          {/* Footer */}
-          <div className="bg-gray-50 border-t border-gray-100 px-8 py-4 text-center">
+          {/* Footer strip */}
+          <div
+            className="px-8 py-4 text-center border-t"
+            style={{ background: '#faf8f3', borderColor: '#f0ece0' }}
+          >
             <p className="text-xs text-gray-400">
-              🔒 Your information is private and never sold.
+              🔒 Your information is private and never sold.{' '}
               By submitting you agree to receive your Growth Score report by email.
             </p>
           </div>
