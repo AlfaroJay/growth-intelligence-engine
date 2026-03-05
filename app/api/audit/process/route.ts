@@ -37,6 +37,23 @@ function getTierFromScore(score: number): GrowthTier {
   return 'Foundation';
 }
 
+function generatePriorityActions(signalScore: SignalBasedScore): string[] {
+  const actions: string[] = [];
+  const breakdown = signalScore.breakdown;
+
+  // Add actions based on lowest-scoring pillars
+  const scores = [
+    { score: breakdown.measurement_infrastructure, action: 'Implement GA4 and GTM infrastructure to measure digital performance accurately' },
+    { score: breakdown.search_opportunity, action: 'Optimize on-page SEO (meta tags, headers, schema markup) to improve organic visibility' },
+    { score: breakdown.performance_ux, action: 'Improve page speed and mobile responsiveness to reduce bounce rate and improve conversions' },
+    { score: breakdown.conversion_readiness, action: 'Set up conversion tracking and optimize call-to-actions on high-traffic pages' },
+    { score: breakdown.execution_maturity, action: 'Establish marketing processes and team skills for consistent campaign execution' },
+  ].sort((a, b) => a.score - b.score);
+
+  // Take the 3 lowest-scoring areas
+  return scores.slice(0, 3).map(item => item.action);
+}
+
 function signalScoreToGrowthScore(signalScore: SignalBasedScore): GrowthScore {
   return {
     model: 'AC-GIE-v1.0',
@@ -49,7 +66,7 @@ function signalScoreToGrowthScore(signalScore: SignalBasedScore): GrowthScore {
       execution_fit: signalScore.breakdown.execution_maturity,
     },
     tier: getTierFromScore(signalScore.growth_score),
-    priority_actions: [],
+    priority_actions: generatePriorityActions(signalScore),
     details: {
       measurement_maturity: [],
       search_opportunity: [],
