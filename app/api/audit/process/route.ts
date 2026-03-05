@@ -23,7 +23,7 @@ import { crawlWebsite } from '@/lib/crawler';
 import { scoreFromSignals } from '@/lib/scoring-engine-v2';
 import { detectOpportunities } from '@/lib/opportunity-engine';
 import { estimateRevenueOpportunity } from '@/lib/revenue-engine';
-import { generateReport } from '@/lib/report-generator';
+import { generateSignalBasedReport } from '@/lib/report-generator-v2';
 import { sendClientEmail, sendAdminEmail } from '@/lib/email';
 import type { IntakeSubmission, SignalBasedScore } from '@/types';
 
@@ -111,10 +111,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       process.env.NEXT_PUBLIC_BASE_URL ??
       `https://${request.headers.get('host')}`;
     const reportUrl = `${baseUrl}/report/${job.share_token}`;
-    
-    // For now, pass signal score as the score parameter to generateReport
-    // generateReport will be updated to handle SignalBasedScore
-    const reportHtml = generateReport(signalScore as unknown as any, submission, reportUrl);
+    const reportHtml = generateSignalBasedReport(signalScore, submission, reportUrl);
 
     // ── Save crawled pages (bulk insert) ──────────────────────
     if (crawlResult.pages.length > 0) {
