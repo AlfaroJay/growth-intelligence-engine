@@ -47,19 +47,31 @@ function scoreMeterSvg(total: number): string {
   const scoreColor =
     total >= 70 ? '#16a34a' : total >= 45 ? '#d97706' : '#dc2626';
 
+  // Calculate start position for the progress arc (top of circle, rotating clockwise)
+  // We need to offset by -90 degrees since SVG arcs start at 0 degrees (right side)
+  const startAngle = -90;
+  const endAngle = startAngle + (total / 100) * 360;
+
+  // Convert angles to radians and calculate path
+  const startRad = (startAngle * Math.PI) / 180;
+  const endRad = (endAngle * Math.PI) / 180;
+  const x1 = 100 + radius * Math.cos(startRad);
+  const y1 = 100 + radius * Math.sin(startRad);
+  const x2 = 100 + radius * Math.cos(endRad);
+  const y2 = 100 + radius * Math.sin(endRad);
+  const largeArc = total > 50 ? 1 : 0;
+
   return `
   <svg viewBox="0 0 200 200" width="160" height="160" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle -->
     <circle cx="100" cy="100" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="16"/>
-    <circle cx="100" cy="100" r="${radius}" fill="none"
-      stroke="${scoreColor}" stroke-width="16"
-      stroke-dasharray="${progress} ${circumference}"
-      stroke-dashoffset="${circumference * 0.25}"
-      stroke-linecap="round"
-      transform="rotate(-90 100 100)"
-    />
-    <text x="100" y="95" text-anchor="middle" font-family="Inter,sans-serif"
+    <!-- Progress arc -->
+    <path d="M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}"
+      fill="none" stroke="${scoreColor}" stroke-width="16" stroke-linecap="round"/>
+    <!-- Score text -->
+    <text x="100" y="105" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif"
       font-size="40" font-weight="700" fill="${scoreColor}">${total}</text>
-    <text x="100" y="120" text-anchor="middle" font-family="Inter,sans-serif"
+    <text x="100" y="125" text-anchor="middle" font-family="Inter,sans-serif"
       font-size="13" fill="#6b7280">out of 100</text>
   </svg>`;
 }
