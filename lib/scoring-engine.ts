@@ -420,15 +420,17 @@ function buildPriorityActions(
   // Sort by missed points (highest impact first)
   missed.sort((a, b) => b.points - a.points);
 
+  const pillarLabel: Record<keyof Subscores, string> = {
+    measurement_maturity: 'Measurement',
+    search_opportunity: 'SEO',
+    performance_ux: 'Performance',
+    conversion_readiness: 'Conversion',
+    execution_fit: 'Execution',
+  };
+
   return missed.slice(0, 5).map((m) => {
-    const pillarLabel: Record<keyof Subscores, string> = {
-      measurement_maturity: 'Measurement',
-      search_opportunity: 'SEO',
-      performance_ux: 'Performance',
-      conversion_readiness: 'Conversion',
-      execution_fit: 'Execution',
-    };
-    return `[${pillarLabel[m.pillar]}] ${m.label} (+${m.points} pts potential)`;
+    const label = pillarLabel[m.pillar] || m.pillar;
+    return `[${label}] ${m.label} (+${m.points} pts potential)`;
   });
 }
 
