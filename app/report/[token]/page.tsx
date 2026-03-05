@@ -29,54 +29,40 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // ─── AlphaCreative Logo ─────────────────────────────────────────
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  const isLight = variant === 'light';
+  // Full AlphaCreative wordmark in yellow (your actual logo)
   return (
-    <div className="flex items-center gap-3">
-      <div
-        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-        style={{
-          background: isLight ? GOLD : NAVY,
-          boxShadow: isLight ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`,
-        }}
+    <svg
+      viewBox="0 0 300 60"
+      width={200}
+      height={40}
+      style={{ display: 'block' }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      {/* Yellow text: "alpha" */}
+      <text
+        x="10"
+        y="45"
+        fontFamily="Nunito, sans-serif"
+        fontSize="48"
+        fontWeight="900"
+        fill="#FCBA12"
+        letterSpacing="-1"
       >
-        <span
-          style={{
-            fontFamily: NUNITO,
-            fontSize: '15px',
-            lineHeight: 1,
-            color: isLight ? NAVY : GOLD,
-            fontWeight: 900,
-            letterSpacing: '-0.03em',
-          }}
-        >
-          aC
-        </span>
-      </div>
-      <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
-        <span
-          style={{
-            fontSize: '17px',
-            fontWeight: 800,
-            color: isLight ? GOLD : NAVY,
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-          }}
-        >
-          alpha
-        </span>
-        <span
-          style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            color: isLight ? '#ffffff' : NAVY,
-            letterSpacing: '0.12em',
-            lineHeight: 1.2,
-          }}
-        >
-          CREATIVE
-        </span>
-      </div>
-    </div>
+        alpha
+      </text>
+      {/* White text: "CREATIVE" - positioned to right */}
+      <text
+        x="160"
+        y="38"
+        fontFamily="Nunito, sans-serif"
+        fontSize="18"
+        fontWeight="700"
+        fill="#ffffff"
+        letterSpacing="2"
+      >
+        CREATIVE
+      </text>
+    </svg>
   );
 }
 

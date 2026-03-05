@@ -67,60 +67,43 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // Uses your real logo from Dropbox
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  const iconColor = variant === 'light' ? GOLD : NAVY;
-  const shadowColor = variant === 'light' ? `0 0 20px rgba(252,186,18,0.35)` : `0 2px 8px rgba(0,29,61,0.25)`;
-  
-  return (
-    <div className="flex items-center gap-2.5">
-      {/* SVG Alpha icon */}
-      <div
-        className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center"
-        style={{
-          background: variant === 'light' ? `rgba(252, 186, 18, 0.1)` : `rgba(0, 29, 61, 0.05)`,
-          boxShadow: shadowColor,
-        }}
+  // Full AlphaCreative wordmark in your brand colors
+  if (variant === 'light') {
+    // Yellow on transparent for light backgrounds
+    return (
+      <svg
+        viewBox="0 0 300 60"
+        width={180}
+        height={36}
+        style={{ display: 'block' }}
+        xmlns="http://www.w3.org/2000/svg"
       >
-        <svg
-          viewBox="0 0 24 24"
-          width="24"
-          height="24"
-          fill="none"
-          stroke={iconColor}
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M12 2L2 22h20L12 2Z" />
-          <line x1="12" y1="8" x2="8" y2="20" />
-          <line x1="12" y1="8" x2="16" y2="20" />
-        </svg>
-      </div>
-      {/* Wordmark: "alpha" + "CREATIVE" */}
-      <div className="flex flex-col leading-none" style={{ fontFamily: NUNITO }}>
-        <span
-          style={{
-            fontSize: '17px',
-            fontWeight: 800,
-            color: variant === 'light' ? GOLD : NAVY,
-            letterSpacing: '-0.03em',
-            lineHeight: 1,
-          }}
-        >
+        <text x="10" y="45" fontFamily="Nunito, sans-serif" fontSize="48" fontWeight="900" fill="#FCBA12" letterSpacing="-1">
           alpha
-        </span>
-        <span
-          style={{
-            fontSize: '10px',
-            fontWeight: 700,
-            color: variant === 'light' ? '#ffffff' : NAVY,
-            letterSpacing: '0.12em',
-            lineHeight: 1.2,
-          }}
-        >
+        </text>
+        <text x="160" y="38" fontFamily="Nunito, sans-serif" fontSize="18" fontWeight="700" fill="#ffffff" letterSpacing="2">
           CREATIVE
-        </span>
-      </div>
-    </div>
+        </text>
+      </svg>
+    );
+  }
+  
+  // Dark (navy) on light backgrounds
+  return (
+    <svg
+      viewBox="0 0 300 60"
+      width={180}
+      height={36}
+      style={{ display: 'block' }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <text x="10" y="45" fontFamily="Nunito, sans-serif" fontSize="48" fontWeight="900" fill="#001D3D" letterSpacing="-1">
+        alpha
+      </text>
+      <text x="160" y="38" fontFamily="Nunito, sans-serif" fontSize="18" fontWeight="700" fill="#001D3D" letterSpacing="2">
+        CREATIVE
+      </text>
+    </svg>
   );
 }
 
