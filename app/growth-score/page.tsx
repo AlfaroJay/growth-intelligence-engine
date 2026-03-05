@@ -456,8 +456,8 @@ export default function GrowthScorePage() {
       }
     }
     if (step === 2) {
-      if (services.length === 0 || !adSpend || !implementationTimeline) {
-        setError('Please complete all selections before continuing.');
+      if (services.length === 0) {
+        setError('Please select at least one service.');
         return;
       }
     }
@@ -702,14 +702,14 @@ export default function GrowthScorePage() {
                       cols={2}
                     />
                   </Field>
-                  <Field label="What is your current online ad spend?" required>
+                  <Field label="What is your current online ad spend?">
                     <SingleSelect
                       options={AD_SPEND}
                       value={adSpend}
                       onChange={setAdSpend}
                     />
                   </Field>
-                  <Field label="When are you looking to implement growth strategies?" required>
+                  <Field label="When are you looking to implement growth strategies?">
                     <SingleSelect
                       options={IMPLEMENTATION_TIMELINE}
                       value={implementationTimeline}
