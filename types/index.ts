@@ -402,3 +402,41 @@ export interface AdminEmailData {
   jobId: string;
   reportUrl: string;
 }
+
+// ─── Signal-Based Scoring (v2) ───────────────────────────────
+
+export interface ScoreBreakdown {
+  measurement_infrastructure: number;
+  search_opportunity: number;
+  performance_ux: number;
+  conversion_readiness: number;
+  execution_maturity: number;
+}
+
+export type OpportunitySeverity = 'critical' | 'high' | 'medium' | 'low';
+
+export interface Opportunity {
+  type: string;
+  severity: OpportunitySeverity;
+  message: string;
+  evidence: Record<string, unknown>;
+}
+
+export interface RevenueOpportunity {
+  lost_traffic_range: { min: number; max: number };
+  lost_leads_per_month: number;
+  lost_revenue_range: { min: number; max: number };
+  confidence: number;
+}
+
+export interface SignalBasedScore {
+  domain: string;
+  pages_analyzed: number;
+  signals_detected: number;
+  growth_score: number;
+  breakdown: ScoreBreakdown;
+  opportunities: Opportunity[];
+  revenue_opportunity: RevenueOpportunity;
+  confidence: number;
+  scored_at: string;
+}
