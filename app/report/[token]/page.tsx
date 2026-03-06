@@ -29,43 +29,18 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // ─── AlphaCreative Logo ─────────────────────────────────────────
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  // Your actual AlphaCreative logo - full wordmark
+  // Your actual AlphaCreative logo hosted on GitHub
   return (
-    <svg
-      viewBox="0 0 280 70"
-      width={224}
-      height={56}
-      style={{ display: 'block' }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      {/* Yellow "alpha" - bold, large */}
-      <text
-        x="0"
-        y="52"
-        fontFamily="'Nunito', sans-serif"
-        fontSize="62"
-        fontWeight="900"
-        fill="#FCBA12"
-        letterSpacing="-2"
-        style={{ textAnchor: 'start' }}
-      >
-        alpha
-      </text>
-      
-      {/* White "CREATIVE" - smaller, right-aligned */}
-      <text
-        x="0"
-        y="70"
-        fontFamily="'Nunito', sans-serif"
-        fontSize="14"
-        fontWeight="700"
-        fill="#ffffff"
-        letterSpacing="3"
-        style={{ textAnchor: 'start' }}
-      >
-        CREATIVE
-      </text>
-    </svg>
+    <img
+      src="https://raw.githubusercontent.com/AlfaroJay/growth-intelligence-engine/main/Artboard%208@3x.png"
+      alt="AlphaCreative"
+      style={{
+        height: '40px',
+        width: 'auto',
+        maxWidth: '240px',
+        display: 'block',
+      }}
+    />
   );
 }
 

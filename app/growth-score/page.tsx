@@ -67,41 +67,18 @@ const NUNITO    = '"Nunito", "Inter", system-ui, sans-serif';
 // Uses your real logo from Dropbox
 
 function AlphaLogo({ variant = 'light' }: { variant?: 'light' | 'dark' }) {
-  // Your actual AlphaCreative logo - full wordmark
-  if (variant === 'light') {
-    return (
-      <svg
-        viewBox="0 0 280 70"
-        width={224}
-        height={56}
-        style={{ display: 'block' }}
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <text x="0" y="52" fontFamily="'Nunito', sans-serif" fontSize="62" fontWeight="900" fill="#FCBA12" letterSpacing="-2">
-          alpha
-        </text>
-        <text x="0" y="70" fontFamily="'Nunito', sans-serif" fontSize="14" fontWeight="700" fill="#ffffff" letterSpacing="3">
-          CREATIVE
-        </text>
-      </svg>
-    );
-  }
-  
+  // Your actual AlphaCreative logo hosted on GitHub
   return (
-    <svg
-      viewBox="0 0 280 70"
-      width={224}
-      height={56}
-      style={{ display: 'block' }}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <text x="0" y="52" fontFamily="'Nunito', sans-serif" fontSize="62" fontWeight="900" fill="#001D3D" letterSpacing="-2">
-        alpha
-      </text>
-      <text x="0" y="70" fontFamily="'Nunito', sans-serif" fontSize="14" fontWeight="700" fill="#001D3D" letterSpacing="3">
-        CREATIVE
-      </text>
-    </svg>
+    <img
+      src="https://raw.githubusercontent.com/AlfaroJay/growth-intelligence-engine/main/Artboard%208@3x.png"
+      alt="AlphaCreative"
+      style={{
+        height: '36px',
+        width: 'auto',
+        maxWidth: '220px',
+        display: 'block',
+      }}
+    />
   );
 }
 
