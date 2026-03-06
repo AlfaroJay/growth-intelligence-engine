@@ -41,12 +41,14 @@ export async function GET(
   // Security: Verify the viewer is either the submitter or admin
   const submitterEmail = (job.intake_submissions?.[0]?.email || '').toLowerCase().trim();
   const adminEmail = process.env.ADMIN_EMAIL?.toLowerCase().trim();
+  const adminEmailAlt = process.env.ADMIN_EMAIL_ALT?.toLowerCase().trim(); // Alternative admin email
 
   // Log for debugging
   console.log(`[report auth] Token: ${token.substring(0, 8)}...`);
   console.log(`[report auth] Viewer: ${viewerEmail}`);
   console.log(`[report auth] Submitter: ${submitterEmail}`);
   console.log(`[report auth] Admin: ${adminEmail}`);
+  console.log(`[report auth] Admin Alt: ${adminEmailAlt}`);
 
   // Check if viewer email matches submitter or is admin
   if (!viewerEmail) {
@@ -58,10 +60,11 @@ export async function GET(
 
   const isSubmitter = viewerEmail === submitterEmail;
   const isAdmin = viewerEmail === adminEmail;
+  const isAdminAlt = viewerEmail === adminEmailAlt;
 
-  console.log(`[report auth] isSubmitter: ${isSubmitter}, isAdmin: ${isAdmin}`);
+  console.log(`[report auth] isSubmitter: ${isSubmitter}, isAdmin: ${isAdmin}, isAdminAlt: ${isAdminAlt}`);
 
-  if (!isSubmitter && !isAdmin) {
+  if (!isSubmitter && !isAdmin && !isAdminAlt) {
     return NextResponse.json(
       { error: 'Access denied. This report is private.' },
       { status: 403 }

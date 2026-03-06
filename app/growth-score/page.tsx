@@ -244,6 +244,7 @@ function SingleSelect({
 
 function SuccessScreen({ shareToken }: { shareToken: string }) {
   const [secondsLeft, setSecondsLeft] = useState(5);
+  const reportUrl = `/report/${shareToken}`;
 
   useEffect(() => {
     if (secondsLeft <= 0) {
@@ -255,8 +256,6 @@ function SuccessScreen({ shareToken }: { shareToken: string }) {
     }, 1000);
     return () => clearInterval(timer);
   }, [secondsLeft]);
-
-  void shareToken;
 
   return (
     <div className="text-center py-6 px-2">
@@ -285,7 +284,7 @@ function SuccessScreen({ shareToken }: { shareToken: string }) {
 
       <div className="flex flex-col gap-3 items-center max-w-xs mx-auto">
         <a
-          href="https://alphacreative.as.me/"
+          href={reportUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="w-full inline-flex items-center justify-center gap-2 font-bold px-6 py-4 rounded-xl transition shadow-lg hover:shadow-xl hover:opacity-90 active:scale-95"
@@ -295,6 +294,19 @@ function SuccessScreen({ shareToken }: { shareToken: string }) {
             fontFamily: NUNITO,
             fontWeight: 800,
             letterSpacing: '-0.01em',
+          }}
+        >
+          View Your Report →
+        </a>
+        <a
+          href="https://alphacreative.as.me/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full inline-flex items-center justify-center gap-2 font-medium px-6 py-3 rounded-xl transition border"
+          style={{ 
+            borderColor: NAVY,
+            color: NAVY, 
+            fontFamily: NUNITO,
           }}
         >
           Book Your Strategy Call →
